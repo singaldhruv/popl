@@ -14,20 +14,35 @@ local Take in
    {Browse {Take [1 2 3] 0} == nil }
 end
 
-local Drop in
-   fun {Drop Xs N}
-      if N=<0 then Xs
-      else
-	 case Xs
-	 of nil then nil
-	 [] X|Xr then {Drop Xr N-1}
+local Length Drop DropComp in
+   fun {Length Xs}
+      case Xs
+      of nil then 0
+      [] _|Xr then 1 + {Length Xr}
+      end
+   end
+
+   fun {DropComp Xs N}
+      case Xs
+      of nil then nil
+      [] _|Xr then
+	 if N > 0 then {DropComp Xr N-1}
+	 elseif N == 0 then Xs
+	 else nil 
 	 end
       end
    end
+   
+   fun {Drop Xs N}
+      if N =< 0 then Xs
+      else { DropComp Xs ({Length Xs} - N) }
+      end
+   end
+   
    /* Tests Drop */
-   {Browse {Drop [5 1 2] 1} == [1 2] }
+   {Browse {Drop [5 1 2] 2} == [1 2] }
    {Browse {Drop [1 4] 3} == nil }
-   {Browse {Drop [1 2] ~2} == [1 2] }
+   {Browse {Drop [1 2] 0} == [1 2] }
 end
 
 local Merge in
