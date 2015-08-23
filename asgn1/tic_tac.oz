@@ -42,7 +42,7 @@ local WhoWon Won WonRow WonCol WonDiag RowSame ColSame Nth WonLeadD BoardRev in
    fun {BoardRev Board}
       case Board
       of nil then nil
-      [] X|Xs then {List.reverse X}|{BoardRev Xs}
+      [] X|Xs then {Reverse X}|{BoardRev Xs}
       end
    end
    
@@ -66,13 +66,13 @@ local WhoWon Won WonRow WonCol WonDiag RowSame ColSame Nth WonLeadD BoardRev in
    /*add tests */
 
    local TestBoard1 in
-      TestBoard1 = [ ["x" "x" "o"] ["x" "o" "o"] ["o" "o" "x"] ]
+      TestBoard1 = [ [x x o] [x o o] [o o x] ]
       /*
       x x o
       x o o
       o o x
       */
-      {Browse o == {WhoWon TestBoard1}}
+      {Browse {WhoWon TestBoard1}}
    end
 end
 
