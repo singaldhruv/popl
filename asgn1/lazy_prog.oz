@@ -1,32 +1,34 @@
-declare TaylorSin NextTerm Abs in
-
-fun {Abs X}
-   if X > 0 then X
-   else ~X
-   end
-end
+declare TaylorSin NextTerm NCond TaylorSinN EpsCond TaylorSinEps in
 
 fun {NextTerm X N Term}
-   0 - (X*X*Term)/(2*N)*(2*N+1)
+   X*X*Term/{Int.toFloat (2*N)*(2*N+1) }
 end
-   
-fun {TaylorSin X N Term TermCond Param}
+
+/* For testing, consider removing the lazy declaration */
+
+fun lazy {TaylorSin X N Term TermCond Param}
    if {TermCond X Term N Param} then Term | {TaylorSin X N+1  {NextTerm X N Term} TermCond Param}
    else nil
    end
 end
 
-local EpsCond TaylorSinEps in
-   fun {EpsCond X Term N Eps}
-      {Abs (Term - {NextTerm X N Term}) > Eps}
-   end
-
-   fun {TaylorSinEps X Eps} 
-      {TaylorSin X 1 X EpsCond Eps}
-   end
-
-   {Browse {TaylorSinEps 1 0.01}}
+fun {NCond X Term NTaylor N}
+   NTaylor =< N
 end
 
+fun {TaylorSinN X N} 
+   {TaylorSin X 1 X NCond N}
+end
 
-   
+{Browse {TaylorSinN 0.5 4}}
+
+
+fun {EpsCond X Term N Eps}
+   {Abs Term - {NextTerm X N Term}} > Eps
+end
+
+fun {TaylorSinEps X Eps} 
+   {TaylorSin X 1 X EpsCond Eps}
+end
+
+{Browse {TaylorSinEps 0.5 0.00001}}
