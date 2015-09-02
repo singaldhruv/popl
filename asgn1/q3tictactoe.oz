@@ -63,20 +63,28 @@ local WhoWon Won WonRow WonCol WonDiag RowSame ColSame Nth WonLeadD BoardRev in
       end
    end
    
-   /*add tests */
+   /* tests */
 
-   local TestBoard1 in
-      TestBoard1 = [ [x x o] [x o o] [o o x] ]
+   local TestB1 TestB2 in
       /*
       x x o
       x o o
       o o x
       */
-      {Browse {WhoWon TestBoard1}}
+      TestB1 = [ [x x o] [x o o] [o o x] ]
+      /*
+      o x o
+      x x x
+      o o x
+      */
+      TestB2 = [[o x o] [x x x] [o o x]]
+      %{Browse {WhoWon TestB1} == o}
+      %{Browse {WhoWon TestB2} == x}
    end
 end
 
 local AllBoards RepS RepsAux Cross1 Cross2 Cross3 in
+   %CrossN is the function returning all lists in the cartesian product of the set of lists in the Nth position with the rest of the lists.
    fun {Cross1 Xs Y Z}
       case Xs
       of nil then nil
@@ -97,6 +105,7 @@ local AllBoards RepS RepsAux Cross1 Cross2 Cross3 in
       [] Z|Zr then [X Y Z]|{Cross3 X Y Zr}
       end
    end
+   
    fun {RepsAux M Xl Xr SoFar}
 	    case Xr
 	    of nil then SoFar
@@ -110,7 +119,7 @@ local AllBoards RepS RepsAux Cross1 Cross2 Cross3 in
    fun {RepS M Xs}
 	 {RepsAux M nil Xs nil}
    end
-	 /*can be made like the aux*/
+	 
    fun {AllBoards M Board}
       case Board
       of X|Xr then
@@ -120,9 +129,23 @@ local AllBoards RepS RepsAux Cross1 Cross2 Cross3 in
 	 end
       end
    end
-   local TestB1 in
+   %Tests TicTacToe
+   local TestB1 TestB2 in
+      /*
+      o o s
+      x o x
+      x o s
+      */
       TestB1 = [[o o s] [x o x] [x o s]]
-      {Browse {AllBoards o TestB1} }
+      /*
+      o s s
+      x s o
+      x o x
+      */
+      TestB2 = [[o s s] [x s o] [x o x]]
+      
+      %{Browse {AllBoards o TestB1} }
+      %{Browse {AllBoards x TestB2}}
    end
 end
 
