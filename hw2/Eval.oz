@@ -21,7 +21,7 @@ declare S Eval in
 		  fun {PushStmtSeq RemStmt PartStack}
 		     case RemStmt
 		     of nil then PartStack
-		     [] H|T then {PushStack {PushStmtSeq T PartStack} [semstmt(stmt:H env:TopEnv)]}
+		     [] H|T then {PushStack {PushStmtSeq T PartStack} semstmt(stmt:H env:TopEnv)}
 		     end
 		  end
 		  {Eval {PushStmtSeq TopStmt {PopStack Stack}}}		  
@@ -32,5 +32,6 @@ declare S Eval in
       end
    end
 
-   S = [[nop] [nop]]
+   S = [[nop] [nop] [nop]]
+   
    {Browse {Eval [semstmt(stmt:S env:Dictionary.new)]}}
