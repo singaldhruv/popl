@@ -25,13 +25,17 @@ declare Eval in
 	    [] nop then {Eval NStack}
 	    [] localvar|ident(V)|InnerStmt then
 	       %Adjoin and push new environment
+	       %TODO: Keep bound list for closures implementation
 	       local NewEnv in
 		  NewEnv = {AdjoinEnvV TopEnv V}
+		  {Browse {Dictionary.entries NewEnv}}
 		  {Eval {PushStack NStack semstmt(stmt:InnerStmt env:NewEnv)}}
 	       end
+	    [] bind|X|Y then
+	       
 	    [] S1|S2 then
 	       local Stack1 StackNew in
-		  if S2 /=nil then
+		  if S2 \= nil then
 		     Stack1 = {PushStack NStack semstmt(stmt:S2 env:TopEnv)}
 		  end
 		  StackNew = {PushStack Stack1 semstmt(stmt:S1 env:TopEnv)}
@@ -45,8 +49,8 @@ declare Eval in
 
    local Test1 Test2 in
       %Test1 = [[nop] [[nop] [nop]] [nop]]
-      %{Inspect {Eval [semstmt(stmt:Test1 env:Dictionary.new)]}}
+      %{Inspect {Eval [semstmt(stmt:Test1 env:{Dictionary.new})]}}
 
       Test2 = [localvar ident(x) [localvar ident(y) [localvar ident(x) [nop]]]]
-      {Inspect {Eval [semstmt(stmt:Test2 env:Dictionary.new)]}}
+      {Inspect {Eval [semstmt(stmt:Test2 env:{Dictionary.new})]}}
    end

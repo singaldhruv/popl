@@ -4,15 +4,13 @@ fun {AdjoinEnvV Env V}
    %binding in the environment is to a num
    %TODO, can we append a prefix (like a letter) to Num?
    local Num in
-      {Browse Env}
-      Num = {Length {SAS.keys}}
-      if {Env.member V} then
+      Num = {List.length {Dictionary.keys SAS}} + 1
+      if {Dictionary.member Env V} then
       %Already in the dictionary, adjoin
-	 {Env.remove V}
+	 {Dictionary.remove Env V}
       end
-      {Env.put V (Num+1) }
+      {Dictionary.put Env V Num}
+      {Dictionary.put SAS Num nil }
+      Env
    end
 end
-
-      
-      
