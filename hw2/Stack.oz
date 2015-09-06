@@ -1,4 +1,5 @@
-declare PopStack PushStack TopStack
+declare PopStack PushStack TopStack in
+
     fun {PopStack S}
        case S
        of nil then {Error "Tried popping empty stack"}
@@ -16,5 +17,5 @@ declare PopStack PushStack TopStack
     fun {PushStack S Elem}
        Elem | S
     end
-end
+
 
