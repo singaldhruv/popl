@@ -1,14 +1,16 @@
-local S Statement in
-   S = [[nop] [[nop] [nop]] [nop]]
+\insert 'Stack.oz'
 
-   fun {Statement X}
-      case X
-      of nop then true
-      [] nil then true
-      [] Hs|Ts then {And {Statement Hs} {Statement Ts}}
-      else false
+local S Eval in
+   S = [[nop] [nop] [nop]]
+
+   fun {Eval Stack}
+      TopSemStmt = {TopStack Stack}
+      TopStmt = TopSemStmt.stmt
+      case TopStmt
+      of nop then {Eval {PopStack Stack}}
       end
    end
-
-   {Browse {Statement S}}
+   {Browse {Eval semstack(stmt:S env:Dictionary.new}}
 end
+
+   
