@@ -1,5 +1,6 @@
 declare SAS in
 
+%Global Single Assignment Store - A dictionary containing variables
 SAS = {Dictionary.new}
 
 \insert 'Stack.oz'
@@ -25,11 +26,9 @@ declare Eval in
 	       %Adjoin and push new environment
 	       %TODO: Keep bound list for closures implementation
 	       local NewEnv in
-		  NewEnv = {AdjoinEnvV TopEnv V}
-		  {Browse {Dictionary.entries NewEnv}}
+		  NewEnv = {Adjoin TopEnv V}
 		  {Eval {PushStack NStack semstmt(stmt:InnerStmt env:NewEnv)}}
 	       end
-	    %[] bind|X|Y then
 	       
 	    [] S1|S2 then
 	       local TempStack StackNew in
@@ -41,16 +40,17 @@ declare Eval in
 		  StackNew = {PushStack TempStack semstmt(stmt:S1 env:TopEnv)}
 		  {Eval StackNew}
 	       end
-	       
 	    end
 	 end
       end
    end
 
-   local Test1 in
+   /*
+   local Test1 Test2 in
       Test1 = [[nop] [[nop] [nop] [nop]]]
-      {Browse { Eval [semstmt(stmt:Test1 env:{Dictionary.new})]}}
+      {Inspect { Eval [semstmt(stmt:Test1 env:{Dictionary.new})]}}
 
-      %Test2 = [localvar ident(x) [localvar ident(y) [localvar ident(x) [nop]]]]
-      %{Inspect {Eval [semstmt(stmt:Test2 env:{Dictionary.new})]}}
+      Test2 = [localvar ident(x) [localvar ident(y) [localvar ident(x) [nop]]]]
+      {Inspect {Eval [semstmt(stmt:Test2 env:{Dictionary.new})]}}
    end
+   */

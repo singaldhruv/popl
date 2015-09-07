@@ -1,6 +1,6 @@
-declare AdjoinEnvV in
+declare Adjoin in
 
-fun {AdjoinEnvV Env V}
+fun {Adjoin Env V}
    %binding in the environment is to a num
    %TODO, can we append a prefix (like a letter) to Num?
    local Num in
@@ -10,6 +10,7 @@ fun {AdjoinEnvV Env V}
 	 {Dictionary.remove Env V}
       end
       {Dictionary.put Env V Num}
+      %Doubt: What value do we assign to unbound variables?
       {Dictionary.put SAS Num nil }
       Env
    end
