@@ -20,15 +20,20 @@ declare Eval in
 	    NStack = {PopStack Stack}
 
 	    case TopStmt
-	    of nop then {Eval NStack}
+	       
+	    of nop then
+	       {Eval NStack}
+
+	    
 	    [] localvar|ident(V)|InnerStmt then
-	       %Adjoin and push new environment
 	       %TODO: Keep bound list for closures implementation
 	       local TempKey NewEnv in
 		  TempKey = {AddKeyToSAS}
 		  NewEnv = {Record.adjoinAt TopEnv V TempKey}
+		  {Inspect NewEnv}
 		  {Eval {PushStack NStack semstmt(stmt:InnerStmt env:NewEnv)}}
 	       end
+
 	       
 	    [] S1|S2 then
 	       local TempStack StackNew in
@@ -40,6 +45,13 @@ declare Eval in
 		  StackNew = {PushStack TempStack semstmt(stmt:S1 env:TopEnv)}
 		  {Eval StackNew}
 	       end
+	       
+	    else false
+
+	   % [] bind|ident(X)|ident(Y)|nil then
+	    %   {Unify ident(X) ident(Y) TopEnv}
+	       %{Eval NStack}
+
 	    end
 	 end
       end
