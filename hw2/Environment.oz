@@ -7,7 +7,7 @@ fun {Adjoin Env V}
       Num = {List.length {Dictionary.keys SAS}} + 1
       if {Dictionary.member Env V} then
       %Already in the dictionary, adjoin
-	 {Dictionary.remove Env V}
+      {Dictionary.remove Env V}
       end
       {Dictionary.put Env V Num}
       %Doubt: What value do we assign to unbound variables?
@@ -15,3 +15,4 @@ fun {Adjoin Env V}
       Env
    end
 end
+
