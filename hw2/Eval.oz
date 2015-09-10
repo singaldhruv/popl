@@ -1,10 +1,10 @@
 declare SAS in
 
 %Global Single Assignment Store - A dictionary containing variables
-SAS = {Dictionary.new}
 
 \insert 'Stack.oz'
-\insert 'Environment.oz'
+\insert 'Unify.oz'
+
 
 declare Eval in
    fun {Eval Stack}
