@@ -33,19 +33,32 @@ declare Eval in
 		  {Eval {PushStack NStack semstmt(stmt:InnerStmt env:NewEnv)}}
 	       end
 
-	    %Binding, check if both the variables are present in the environment or not. If present, Unify them.
-	    [] bind|ident(X)|ident(Y)|nil then
-	       if {Value.hasFeature TopEnv X} == true then
-		  if {Value.hasFeature TopEnv Y} == true then
-		     {Unify ident(X) ident(Y) TopEnv}
+	    %Variable binding.
+	       % If variable-variable binding, check if both the variables are present in the environment or not. If present, Unify them.
+	       %If variable-value binding, check if the literal is valid. If yes, unify them.
+	    [] bind|ident(X)|V|nil then
+	       if {Value.hasFeature TopEnv X} then
+		  case V
+		  of ident(Y) then
+		     if {Value.hasFeature TopEnv Y} then
+			{Unify ident(X) ident(Y) TopEnv}
+			{Eval NStack}
+		     else
+			raise notIntroduced(Y) end
+		     end
+		  [] literal(Y) then
+		     {Unify ident(X) literal(Y) TopEnv}
+		     {Eval NStack}
+		  [] record|L|Pairs then
+		     {Unify ident(X) record|L|Pairs TopEnv}
 		     {Eval NStack}
 		  else
-		     raise notIntroduced(Y) end
-		  end
+		     raise invalidExpression(ident(X) V) end
+		  end				  
 	       else
 		  raise notIntroduced(X) end
 	       end
-
+	 
 	    %Compound statements, push the second statement, only when it is not nil. Always push the first statement.
 	    [] S1|S2 then
 	       local TempStack StackNew in
@@ -67,16 +80,35 @@ declare Eval in
    end
 
    
-   local Test1 Test2 Test3 in
-      %Test for compound statements
-      %Test1 = [[[nop]] [nop]]
-      %{Inspect { Eval [semstmt(stmt:Test1 env:env())]}}
+%Test for compound statements
+/*local Test1 in
+     Test1 = [[[nop]] [nop]]
+     {Inspect { Eval [semstmt(stmt:Test1 env:env())]}}
+end
+      */
 
-      %Test for localvar introduction
-      %Test2 = [localvar ident(x) [localvar ident(y) [localvar ident(x) [nop]]]]
-      %{Inspect {Eval [semstmt(stmt:Test2 env:env())]}}
+%Test for localvar introduction
+/*local Test2 in
+     Test2 = [localvar ident(x) [localvar ident(y) [localvar ident(x) [nop]]]]
+     {Inspect {Eval [semstmt(stmt:Test2 env:env())]}}
+end
+      */
 
-      %Test for variable-variable binding
+%Test for variable-variable binding
+      /*
+local Test3 in
       Test3 = [localvar ident(x) [ [localvar ident(y) [bind ident(x) ident(y)] [nop] ]]]
       {Inspect {Eval [semstmt(stmt:Test3 env:env())]}}
-   end
+end
+*/
+
+%Test for variable-literal binding
+local Test4 Test5 in
+   Test4 = [localvar ident(x) [localvar ident(y) [ [bind ident(x) literal(42)]  [bind ident(x) ident(y)] [bind ident(y) literal(42)] ]]]
+   
+   Test5 = [[ localvar ident(w) [ localvar ident(x) [ localvar ident(y) [ localvar ident(z) [ [bind ident(x) [record literal(testRecord) [ [literal(onlyFeature) ident(w)] ]]]  [bind ident(y) [record literal(testRecord) [ [literal(onlyFeature) ident(z)] ]]] [bind ident(z) literal(42)] [bind ident(w) literal(41)] ] ] ] ] ]]
+
+   %Some issue with records, always evaluates to true, irrespective of the binding values. 
+   {Inspect {Eval [semstmt(stmt:Test5 env:env())]}}
+end
+

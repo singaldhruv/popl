@@ -22,7 +22,7 @@ proc {BindRefToKeyInSAS Key RefKey}
    local CurVal in
       CurVal = {Dictionary.get SAS Key}
       case CurVal
-      of equivalence(X) then {Dictionary.put SAS Key reference(RefKey)}
+      of equivalence(_) then {Dictionary.put SAS Key reference(RefKey)}
       [] reference(X) then {BindRefToKeyInSAS X RefKey}
       else raise alreadyAssignedWhileReferencing(Key RefKey) end
       end
