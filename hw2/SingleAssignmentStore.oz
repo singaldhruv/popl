@@ -19,13 +19,8 @@ proc {BindValueToKeyInSAS Key Val}
 end
 
 proc {BindRefToKeyInSAS Key RefKey}
-   local CurVal in
-      CurVal = {Dictionary.get SAS Key}
-      case CurVal
-      of equivalence(_) then {Dictionary.put SAS Key reference(RefKey)}
-      [] reference(X) then {BindRefToKeyInSAS X RefKey}
-      else raise alreadyAssignedWhileReferencing(Key RefKey) end
-      end
+   if Key \= RefKey then
+      {Dictionary.put SAS Key reference(RefKey)}
    end
 end
 
@@ -38,7 +33,15 @@ fun {AddKeyToSAS}
 end
 
 fun {RetrieveFromSAS Key}
-   {Dictionary.get SAS Key} %This raises an exception, if Key is not present in the SAS
+   local TempValue in
+      TempValue = {Dictionary.get SAS Key}  %This raises an exception, if Key is not present in the SAS
+      
+      case TempValue
+      of reference(X) then
+	    {RetrieveFromSAS X}
+      else TempValue
+      end
+   end
 end
 
    

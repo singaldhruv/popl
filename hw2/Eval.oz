@@ -5,7 +5,8 @@
 
 
 declare Eval in
-   fun {Eval Stack}
+
+fun {Eval Stack}
       local TopSemStmt TopStmt TopEnv NStack in
 	 TopSemStmt = {TopStack Stack}
 	 if TopSemStmt == nil then
@@ -73,42 +74,8 @@ declare Eval in
 
 	    %else the statement does not match any of the given cases, hence an error
 	    else false
-	       
 	    end
 	 end
       end
-   end
-
-   
-%Test for compound statements
-/*local Test1 in
-     Test1 = [[[nop]] [nop]]
-     {Inspect { Eval [semstmt(stmt:Test1 env:env())]}}
-end
-      */
-
-%Test for localvar introduction
-/*local Test2 in
-     Test2 = [localvar ident(x) [localvar ident(y) [localvar ident(x) [nop]]]]
-     {Inspect {Eval [semstmt(stmt:Test2 env:env())]}}
-end
-      */
-
-%Test for variable-variable binding
-      /*
-local Test3 in
-      Test3 = [localvar ident(x) [ [localvar ident(y) [bind ident(x) ident(y)] [nop] ]]]
-      {Inspect {Eval [semstmt(stmt:Test3 env:env())]}}
-end
-*/
-
-%Test for variable-literal binding
-local Test4 Test5 in
-   Test4 = [localvar ident(x) [localvar ident(y) [ [bind ident(x) literal(42)]  [bind ident(x) ident(y)] [bind ident(y) literal(42)] ]]]
-   
-   Test5 = [[ localvar ident(w) [ localvar ident(x) [ localvar ident(y) [ localvar ident(z) [ [bind ident(x) [record literal(testRecord) [ [literal(onlyFeature) ident(w)] ]]]  [bind ident(y) [record literal(testRecord) [ [literal(onlyFeature) ident(z)] ]]] [bind ident(z) literal(42)] [bind ident(w) literal(41)] ] ] ] ] ]]
-
-   %Some issue with records, always evaluates to true, irrespective of the binding values. 
-   {Inspect {Eval [semstmt(stmt:Test5 env:env())]}}
 end
 
