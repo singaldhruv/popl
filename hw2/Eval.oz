@@ -86,6 +86,54 @@ fun {Eval Stack}
 		     end		
 		  else raise notIntroduced(X) end
 		  end
+
+	    %Pattern Matching.
+	    [] match|ident(X)|P|S1|S2 then
+	       %Check if ident(X) is bound and determined or not
+	       if {Value.hasFeature TopEnv X} then
+		  case {RetrieveFromSAS TopEnv.X}
+		  of equivalence(_) then
+		     raise matchOnUnbound(X) end
+		  [] record|LabelX|PairsX then
+		     %Handle record case here
+		     case P
+		     of record|LabelP|PairsP then
+			%Check arity and process
+			local CanonX CanonP in
+			   CanonX = {Canonize PairsX.1}
+			   CanonP = {Canonize PairsP.1}
+
+			   local AdjoinList NewEnv in
+			      AdjoinList = {List.zip CanonX CanonP
+					    fun{$ XPair PPair}
+					       if XPair.1 \= PPair.1 then
+						  raise mismatchInFeatures(XPair.1 PPair.1) end
+					       end
+					       case PPair.2.1
+					       of ident(PValue) then
+						  [PValue XPair.2.1]
+					       else raise invalidPattern(PPair) end
+					       end
+					    end
+					   }
+			      
+			      NewEnv = {FoldL AdjoinList
+					fun{$ Env ToAdjoin}
+					   {Record.adjoinAt Env ToAdjoin.1 ToAdjoin.2.1}
+					end
+					TopEnv}
+			      
+					   
+			       
+			end
+		     else raise matchToNonRecord(P) end
+		     end
+		  else raise matchOnNonRecord(X) end
+		  end
+	       else raise notIntroduced(X) end
+	       end
+	       
+	       
 		  
 
 	       
