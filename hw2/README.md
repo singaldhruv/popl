@@ -1,4 +1,4 @@
-S350A (Principles of Programming Languages) - Homework 2
+CS350A (Principles of Programming Languages) - Homework 2
 =========================================================
 
 ## Team Members:
