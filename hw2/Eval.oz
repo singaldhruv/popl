@@ -13,6 +13,8 @@ end
 
 
 fun {Eval Stack}
+   {Inspect {Dictionary.entries SAS}}
+   {Inspect {TopStack Stack}}
       local TopSemStmt TopStmt TopEnv NStack in
 	 TopSemStmt = {TopStack Stack}
 	 if TopSemStmt == nil then
@@ -86,7 +88,7 @@ fun {Eval Stack}
 		     end		
 		  else raise notIntroduced(X) end
 		  end
-
+/*
 	    %Pattern Matching.
 	    [] match|ident(X)|P|S1|S2 then
 	       %Check if ident(X) is bound and determined or not
@@ -134,7 +136,7 @@ fun {Eval Stack}
 	       end
 	       
 	       
-		  
+		  */
 
 	       
 	    %Compound statements, push the second statement, only when it is not nil. Always push the first statement.
