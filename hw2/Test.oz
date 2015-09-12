@@ -5,14 +5,14 @@
 %Test for compound statements
 local Test1 in
      Test1 = [[[nop]] [nop]]
-     {Inspect { Eval [semstmt(stmt:Test1 env:env())]}}
+     {Inspect {Interpret Test1}}
 end
-      */
+*/      
 
 %Test for localvar introduction
 /*local Test2 in
      Test2 = [localvar ident(x) [localvar ident(y) [localvar ident(x) [nop]]]]
-     {Inspect {Eval [semstmt(stmt:Test2 env:env())]}}
+     {Inspect {Interpret Test2}}
 end
       */
 
@@ -20,7 +20,7 @@ end
     /*  
 local Test3 in
       Test3 = [localvar ident(x) [ [localvar ident(y) [bind ident(x) ident(y)]  ]]]
-      {Inspect {Eval [semstmt(stmt:Test3 env:env())]}}
+      {Inspect {Interpret Test3}}
 end
 */
 
@@ -87,6 +87,6 @@ local Test4 Test5 Test6 Test7 in
    
 
    %Some issue with records, always evaluates to true, irrespective of the binding values. 
-   {Inspect {Eval [semstmt(stmt:Test7 env:env())]}}
+   {Inspect {Interpret Test7}}
 end
 */

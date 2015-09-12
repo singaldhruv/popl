@@ -4,7 +4,13 @@
 \insert 'Unify.oz'
 
 
-declare Eval in
+declare Eval Interpret in
+
+
+fun {Interpret Stmt}
+   {Eval [semstmt(stmt:Stmt env:env())]}
+end
+
 
 fun {Eval Stack}
       local TopSemStmt TopStmt TopEnv NStack in
