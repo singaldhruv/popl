@@ -44,7 +44,7 @@ local Test4 Test5 Test6 Test7 in
 		[ localvar ident(y)
 		  [ localvar ident(y1)
 		    [ [bind ident(x) [record literal(testRecord) [ [literal(onlyFeature) ident(x1)] ]]]
-		      [bind ident(x1) literal(1)]
+		      [bind ident(x1) literal(2)]
 		      [bind ident(y) [record literal(testRecord) [ [literal(onlyFeature) ident(y1)] ]]]
 		      [bind ident(y1) literal(2)]
 		      [bind ident(x) ident(y)]
@@ -85,9 +85,10 @@ local Test4 Test5 Test6 Test7 in
 	    ]
 	   ]
     
-   {Inspect {Interpret Test7}}
+   {Inspect {Interpret Test5}}
 end
 */
+
 /*
 %Test for condtionals
 local Test8 in
