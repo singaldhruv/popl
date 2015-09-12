@@ -84,9 +84,28 @@ local Test4 Test5 Test6 Test7 in
 	      ]
 	    ]
 	   ]
-   
-
-   %Some issue with records, always evaluates to true, irrespective of the binding values. 
+    
    {Inspect {Interpret Test7}}
 end
 */
+/*
+%Test for condtionals
+local Test8 in
+   Test8 = [
+	    [ localvar ident(x)
+	      [ localvar ident(y)
+		[
+		 [bind ident(x) true]
+		 [conditional ident(x)
+		  [bind ident(y) literal(1)]
+		  [bind ident(y) literal(0)]
+		 ]
+		]
+	      ]
+	    ]
+	   ]
+
+   {Inspect {Interpret Test8}}
+end
+   */
+	   

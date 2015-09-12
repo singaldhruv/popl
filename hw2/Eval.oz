@@ -59,13 +59,36 @@ fun {Eval Stack}
 		  [] record|L|Pairs then
 		     {Unify ident(X) record|L|Pairs TopEnv}
 		     {Eval NStack}
+		  [] true then
+		     {Unify ident(X) true TopEnv}
+		     {Eval NStack}
+		  [] false then
+		     {Unify ident(X) false TopEnv}
+		     {Eval NStack}
 		  else
 		     raise invalidExpression(ident(X) V) end
 		  end				  
 	       else
 		  raise notIntroduced(X) end
 	       end
-	 
+
+	    %Conditional. Check if ident(X) is defined or not. If defined, check if it's a boolean. If it's a boolean, operate accordingly
+	       [] conditional|ident(X)|S1|S2 then
+		  if {Value.hasFeature TopEnv X} then
+		     case {RetrieveFromSAS TopEnv.X}
+		     of equivalence(_) then
+			raise conditionalOnUnbound(X) end
+		     [] true then
+			 {Eval {PushStack NStack semstmt(stmt:S1 env:TopEnv)}}
+		     [] false then
+			{Eval {PushStack NStack semstmt(stmt:S2 env:TopEnv)}}
+		     else raise conditionalOnNonBool(X) end
+		     end		
+		  else raise notIntroduced(X) end
+		  end
+		  
+
+	       
 	    %Compound statements, push the second statement, only when it is not nil. Always push the first statement.
 	    [] S1|S2 then
 	       local TempStack StackNew in
