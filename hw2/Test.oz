@@ -88,15 +88,15 @@ local Test4 Test5 Test6 Test7 in
    {Inspect {Interpret Test5}}
 end
 */
-
 /*
+
 %Test for condtionals
 local Test8 in
    Test8 = [
 	    [ localvar ident(x)
 	      [ localvar ident(y)
 		[
-		 [bind ident(x) true]
+		 [bind ident(x) false]
 		 [conditional ident(x)
 		  [bind ident(y) literal(1)]
 		  [bind ident(y) literal(0)]
@@ -108,5 +108,5 @@ local Test8 in
 
    {Inspect {Interpret Test8}}
 end
-   */
-	   
+   
+	   */
