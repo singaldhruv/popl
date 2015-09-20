@@ -120,8 +120,12 @@ local Test9 in
 	       [
 		[bind ident(x) [record literal(myRecord) [ [literal(onlyFeature) ident(y)] ]]]
 		[match ident(x) [record literal(myRecord) [ [literal(onlyFeature) ident(z)] ]]
-		 [bind ident(z) literal(100)]
-		 [bind ident(y) literal(200)]
+		 [
+		  [bind ident(z) literal(100)]
+		  [bind ident(y) literal(100)]
+		  %[bind ident(y) literal(200)]
+		 ]
+		 [bind ident(y) literal(300)]
 		]
 	       ]
 	     ]

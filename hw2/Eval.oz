@@ -97,38 +97,43 @@ fun {Eval Stack}
 		     		raise matchOnUnbound(X) end
 		  		[] record|LabelX|PairsX then
 		     		%Handle record case here
-		     		try 
-		     			case P
-			 			of record|!LabelX|PairsP then
-			      		%Check arity and process
-			      			local CanonX CanonP AdjoinList NewEnv in
-					 			CanonX = {Canonize PairsX.1}
-					 			CanonP = {Canonize PairsP.1}
+		     		local NewEnv in
+			     		try 
+			     			case P
+				 			of record|!LabelX|PairsP then
+				      		%Check arity and process
+				      			local CanonX CanonP AdjoinList in
+						 			CanonX = {Canonize PairsX.1}
+						 			CanonP = {Canonize PairsP.1}
 
-				    			AdjoinList = {List.zip CanonX CanonP
-						     				fun{$ XPair PPair}
-												if XPair.1 \= PPair.1 then
-							   						raise mismatch(XPair.1 PPair.1) end
+					    			AdjoinList = {List.zip CanonX CanonP
+							     				fun{$ XPair PPair}
+													if XPair.1 \= PPair.1 then
+								   						raise mismatch(XPair.1 PPair.1) end
+													end
+													case PPair.2.1#XPair.2.1
+								   					of ident(PValue)#equivalence(XValue) then [PValue XValue]
+								   					else raise invalidPattern end
+								   					end
 												end
-												case PPair.2.1#XPair.2.1
-							   					of ident(PValue)#equivalence(XValue) then [PValue XValue]
-							   					else raise invalidPattern end
-							   					end
-											end
-						 					}
-			      
-				    			NewEnv = {FoldL AdjoinList
-					      				fun{$ Env ToAdjoin}
-						 					{Record.adjoinAt Env ToAdjoin.1 ToAdjoin.2.1}
-					      				end
-					      				TopEnv}
-				    			{Eval {PushStack NStack semstmt(stmt:S1 env:NewEnv)}}
-				    		end
-				    	else raise matchOnIllegalValue(P) end
-				    	end
-				    catch Error then
-						{Eval {PushStack NStack semstmt(stmt:S2 env:TopEnv)}}
-		     		end
+							 					}
+				      
+					    			NewEnv = {FoldL AdjoinList
+						      				fun{$ Env ToAdjoin}
+							 					{Record.adjoinAt Env ToAdjoin.1 ToAdjoin.2.1}
+						      				end
+						      				TopEnv}
+						      		raise success end
+					    		end
+					    	else raise matchOnIllegalValue(P) end
+					    	end
+					    catch Error then
+					    	case Error 
+					    	of success then {Eval {PushStack NStack semstmt(stmt:S1 env:NewEnv)}}
+					    	else {Eval {PushStack NStack semstmt(stmt:S2 env:TopEnv)}}
+					    	end
+			     		end
+			     	end
 		  		else raise matchOnIllegalValue(X) end
 		  		end
 		  	end
