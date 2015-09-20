@@ -133,7 +133,8 @@ fun {Eval Stack}
 					    	else {Eval {PushStack NStack semstmt(stmt:S2 env:TopEnv)}}
 					    	end
 			     		end
-			     	end
+				end
+				%Raise an error if X is not a record. Can also be handled by simply pushing S2. 
 		  		else raise matchOnIllegalValue(X) end
 		  		end
 		  	end
