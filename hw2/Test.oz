@@ -110,3 +110,24 @@ local Test8 in
 end
    
 	   */
+
+
+%Test for pattern matching
+local Test9 in
+   
+   Test9 = [ localvar ident(x)
+	     [ localvar ident(y)
+	       [
+		[bind ident(x) [record literal(myRecord) [ [literal(onlyFeature) ident(y)] ]]]
+		[match ident(x) [record literal(myRecord) [ [literal(onlyFeature) ident(z)] ]]
+		 [bind ident(z) literal(100)]
+		 [bind ident(y) literal(200)]
+		]
+	       ]
+	     ]
+	   ]
+   
+	      
+   
+   {Inspect {Interpret Test9}}
+end
