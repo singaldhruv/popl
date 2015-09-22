@@ -1,4 +1,4 @@
-declare SAS BindValueToKeyInSAS BindRefToKeyInSAS AddKeyToSAS RetrieveFromSAS in
+declare SAS BindValueToKeyInSAS BindRefToKeyInSAS AddKeyToSAS RetrieveFromSAS BindFuncToKeyInSAS in
 
 SAS = {Dictionary.new}
 
@@ -7,7 +7,6 @@ SAS = {Dictionary.new}
 proc {BindValueToKeyInSAS Key Val}
    local CurVal in
       CurVal = {Dictionary.get SAS Key}
-
       if CurVal \= Val then 
 	 case CurVal 
 	 of equivalence(X) then {Dictionary.put SAS Key Val}
@@ -15,6 +14,18 @@ proc {BindValueToKeyInSAS Key Val}
 	 else raise alreadyAssigned(Key Val CurVal) end
 	 end
       end
+   end
+end
+
+%check for proc with short circuiting added
+proc {BindFuncToKeyInSAS Key Func}
+   local CurVal in
+      CurVal = {Dictionary.get SAS Key}
+	case CurVal 
+	of equivalence(X) then {Dictionary.put SAS Key Func}
+	%[] reference(X) then {BindValueToKeyInSAS X Val}
+	else raise alreadyAssigned(Key Func CurVal) end
+	end
    end
 end
 

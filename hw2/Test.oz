@@ -111,7 +111,7 @@ end
    
 	   */
 
-
+/*
 %Test for pattern matching
 local Test9 in
    
@@ -134,4 +134,33 @@ local Test9 in
 	      
    
    {Inspect {Interpret Test9}}
+end
+*/
+
+%test for variable proc bind
+/*
+local Test10 in
+   Test10 = [localvar ident(x)
+	     [localvar ident(y)
+	      [
+	       [bind ident(x) [proced [ident(y)] y]]
+	      ]
+	     ]
+	    ]
+	     
+   {Inspect {Interpret Test10}}
+end
+*/
+
+local Test11 in
+   Test11 = [localvar ident(x)
+	     [localvar ident(y)
+	      [bind ident(x) [proced [ident(w)]
+			       [bind ident(w) literal(1)]
+			      ]
+	      ]
+	      [apply ident(x) ident(y)] 
+	     ]
+	    ]
+   {Inspect {Interpret Test11}}
 end

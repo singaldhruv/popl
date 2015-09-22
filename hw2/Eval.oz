@@ -1,16 +1,35 @@
-%Global Single Assignment Store - A dictionary containing variables
 
 \insert 'Stack.oz'
 \insert 'Unify.oz'
 
 
-declare Eval Interpret in
+declare Eval Interpret FreeList BindParams in
 
 
 fun {Interpret Stmt}
 	{Eval [semstmt(stmt:Stmt env:env())]}
 end
 
+%Implementing closures -> copy the old bindings except those of bound vars
+fun {FreeList OldEnv List}
+   case List
+   of ident(H)|T then {AdjoinList {Record.subtract OldEnv H} T}
+   [] nil then OldEnv
+   end
+end
+
+%Bind formal to actual
+fun {BindParams Actual Formal FunEnv CallEnv}
+   case Actual#Formal
+   of (ident(Ha)|Ta)#(ident(Hf)|Tf) then
+      if {Value.hasFeature CallEnv Ha} then
+	 {BindParams Ta Tf {Record.adjoinAt CallEnv Hf CallEnv.Ha} CallEnv}
+      else raise notIntroduced(Ha) end
+      end
+   [] nil#nil then FunEnv
+   else raise mismatchedArgCount end
+   end
+end     
 
 fun {Eval Stack}
    	{Inspect {Dictionary.entries SAS}}
@@ -58,14 +77,21 @@ fun {Eval Stack}
 					{Unify ident(X) literal(Y) TopEnv}
 					{Eval NStack}
 				[] record|L|Pairs then
-					{Unify ident(X) record|L|Pairs TopEnv}
-					{Eval NStack}
+				   {Unify ident(X) record|L|Pairs TopEnv}
+				   {Eval NStack}
 				[] true then
 					{Unify ident(X) true TopEnv}
 					{Eval NStack}
 				[] false then
 					{Unify ident(X) false TopEnv}
-					{Eval NStack}
+				   {Eval NStack}
+				[] proced|Vars|S|nil then
+				   local FreeEnv in
+				      FreeEnv = {FreeList TopEnv Vars}				 
+					 %can also be put as record f:a g:b
+				      {BindFuncToKeyInSAS TopEnv.X func(def:[proced Vars S] closure:FreeEnv)}
+				   end
+				   {Eval NStack}
 				else raise invalidExpression(ident(X) V) end
 		  		end				  
 	    	else raise notIntroduced(X) end
@@ -137,9 +163,23 @@ fun {Eval Stack}
 				%Raise an error if X is not a record. Can also be handled by simply pushing S2. 
 		  		else raise matchOnIllegalValue(X) end
 		  		end
-		  	end
-
-
+		end
+		%function call
+	    [] apply|ident(F)|Params then
+	       if {Value.hasFeature TopEnv F} then
+		  local FuncEnv in
+		     case {RetrieveFromSAS TopEnv.F}
+		     of func(def:proced|Vars|Stmt closure:C) then
+			try FuncEnv = {BindParams Params Vars C TopEnv}
+			catch mismatchedArgCount then raise mismatchedArgCount(F formal#Params actual#Vars) end
+			end
+			{Eval {PushStack NStack semstmt(stmt:Stmt env:FuncEnv)} }
+			
+		     else raise notAFunction(F) end
+		     end
+		  end
+	       else raise undefinedFunction(F) end
+	       end
 	       
 	    %Compound statements, push the second statement, only when it is not nil. Always push the first statement.
 	    [] S1|S2 then
