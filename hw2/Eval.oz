@@ -29,7 +29,7 @@ fun {ComputeClosure Env Stmts EnvSoFar}
 	%TODO!!!
 	[] proced|Vars|S|nil then
 	    local EnvInner in
-	       EnvInner = {ComputeClosure {PutParams {Record.adjoin Env NewEnv} Vars} Stmts NewEnv}
+	       EnvInner = {ComputeClosure {PutParams {Record.adjoin Env NextEnv} Vars} Stmts NextEnv}
 	       {RemoveParams EnvInner Vars}
 	    end
 	else NextEnv %literal, true, false
@@ -52,7 +52,7 @@ fun {ComputeClosure Env Stmts EnvSoFar}
 	       [] nil then BindEnv
 	       end
 	    end
-	    {FuncParamBind Params NextEnv}
+	    {FuncParamsBind Params NextEnv}
 	 end   
       [] S1|S2 then
 	 NextEnv = {ComputeClosure Env S1 EnvSoFar}
