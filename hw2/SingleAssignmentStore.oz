@@ -5,9 +5,15 @@ SAS = {Dictionary.new}
 
 %We know that the Key to be used in this procedure will be obtained through environment, which means that the Key must exist in the SAS
 proc {BindValueToKeyInSAS Key Val}
-   local CurVal in
+   local CurVal IsProc in
       CurVal = {Dictionary.get SAS Key}
-      if CurVal \= Val then 
+      IsProc = fun {$}
+		  case CurVal
+		  of proced|T then true
+		  else false
+		  end
+	       end
+      if {IsProc} orelse CurVal \= Val then 
 	 case CurVal 
 	 of equivalence(X) then {Dictionary.put SAS Key Val}
 	 [] reference(X) then {BindValueToKeyInSAS X Val}
@@ -17,17 +23,6 @@ proc {BindValueToKeyInSAS Key Val}
    end
 end
 
-%check for proc with short circuiting added
-proc {BindFuncToKeyInSAS Key Func}
-   local CurVal in
-      CurVal = {Dictionary.get SAS Key}
-	case CurVal 
-	of equivalence(X) then {Dictionary.put SAS Key Func}
-	%[] reference(X) then {BindValueToKeyInSAS X Val}
-	else raise alreadyAssigned(Key Func CurVal) end
-	end
-   end
-end
 
 proc {BindRefToKeyInSAS Key RefKey}
    if Key \= RefKey then

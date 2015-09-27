@@ -3,17 +3,74 @@
 \insert 'Unify.oz'
 
 
-declare Eval Interpret FreeList BindParams in
+declare Eval Interpret RemoveParams ParamList BindParams ComputeClosure PutParams in
 
 
 fun {Interpret Stmt}
 	{Eval [semstmt(stmt:Stmt env:env())]}
 end
 
-%Implementing closures -> copy the old bindings except those of bound vars
-fun {FreeList OldEnv List}
+%Implementing closures -> copy the old bindings from variables used in function except those of bound vars
+fun {ComputeClosure Env Stmts EnvSoFar}
+   local NextEnv in
+      case Stmts
+      of nop then EnvSoFar
+      [] localvar|ident(X)|S then
+	 NextEnv = {ComputeClosure Env S {Record.adjoinAt EnvSoFar X undefined}}
+	 {Record.subtract NextEnv X}
+      [] bind|ident(X)|V|nil then
+	 NextEnv = {Record.adjoinAt EnvSoFar X Env.X}
+	 case V
+	 of ident(Y) then
+	    {Record.adjoinAt NextEnv Y Env.Y}
+	 [] literal(Y) then NextEnv
+	 [] record|L|Pairs then
+	    NextEnv
+	%TODO!!!
+	[] proced|Vars|S|nil then
+	    local EnvInner in
+	       EnvInner = {ComputeClosure {PutParams {Record.adjoin Env NewEnv} Vars} Stmts NewEnv}
+	       {RemoveParams EnvInner Vars}
+	    end
+	else NextEnv %literal, true, false
+	end
+      [] conditional|ident(X)|S1|S2 then
+	 NextEnv = {Record.adjoinAt EnvSoFar X Env.X }
+	 local CombineEnv in
+	    CombineEnv = {ComputeClosure Env S1 NextEnv}
+	    {ComputeClosure Env S2 CombineEnv}
+	 end
+      [] match|ident(X)|P|S1|S2|nil then
+	 NextEnv
+         %TODO
+      [] apply|ident(F)|Params then
+	 NextEnv = {Record.adjoinAt EnvSoFar F Env.F}
+	 local FuncParamsBind in
+	    fun{FuncParamsBind Params BindEnv}
+	       case Params
+	       of ident(H)|T then {Record.adjoinAt {FuncParamsBind T BindEnv} H Env.H}
+	       [] nil then BindEnv
+	       end
+	    end
+	    {FuncParamBind Params NextEnv}
+	 end   
+      [] S1|S2 then
+	 NextEnv = {ComputeClosure Env S1 EnvSoFar}
+	 {ComputeClosure Env S2 NextEnv}
+      end
+    end
+end      
+
+fun {RemoveParams OldEnv List}
    case List
-   of ident(H)|T then {AdjoinList {Record.subtract OldEnv H} T}
+   of ident(H)|T then {RemoveParams {Record.subtract OldEnv H} T}
+   [] nil then OldEnv
+   end
+end
+
+fun {PutParams OldEnv List}
+   case List
+   of ident(H)|T then {PutParams {Record.adjoinAt OldEnv H undefined} T}
    [] nil then OldEnv
    end
 end
@@ -82,14 +139,14 @@ fun {Eval Stack}
 				[] true then
 					{Unify ident(X) true TopEnv}
 					{Eval NStack}
-				[] false then
-					{Unify ident(X) false TopEnv}
+				[] false then {Unify ident(X) false TopEnv}
 				   {Eval NStack}
 				[] proced|Vars|S|nil then
-				   local FreeEnv in
-				      FreeEnv = {FreeList TopEnv Vars}				 
-					 %can also be put as record f:a g:b
-				      {BindFuncToKeyInSAS TopEnv.X func(def:[proced Vars S] closure:FreeEnv)}
+				   local FreeEnv CopyEnv in
+				      {Record.adjoin env() TopEnv CopyEnv} %Create a copy
+				      FreeEnv = {ComputeClosure {PutParams CopyEnv Vars} S env()}				 
+				      %Put params for computing closure, compute closure and then remove the params
+				      {BindValueToKeyInSAS TopEnv.X func(def:[proced Vars S] closure:{RemoveParams FreeEnv Vars})}
 				   end
 				   {Eval NStack}
 				else raise invalidExpression(ident(X) V) end
