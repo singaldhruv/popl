@@ -25,15 +25,16 @@ fun {ComputeClosure Env Stmts EnvSoFar}
 	    {Record.adjoinAt NextEnv Y Env.Y}
 	 [] literal(Y) then NextEnv
 	 [] record|L|Pairs then
-	    local RecordVars in
+	    local RecordVars Test in
 	       fun{RecordVars Vars LocEnv}
 		  case Vars
-		  of literal(X)|ident(Y)|T then {RecordVars T {Record.adjoinAt LocEnv Y Env.Y}}
+		  of [literal(X) ident(Y)]|T then {RecordVars T {Record.adjoinAt LocEnv Y Env.Y}}
 		  [] H|T then {RecordVars T LocEnv}
 		  [] nil then LocEnv
 		  end
 	       end
-	       {RecordVars Pairs NextEnv}
+	       %TODO confirm (works with Pairs.1)
+	       {RecordVars Pairs.1 NextEnv}
 	    end
 	[] proced|Vars|S|nil then
 	    local EnvInner in

@@ -111,8 +111,7 @@ Test10 =
   [localvar ident(quux)
    [
     [bind ident(bar) [proced [ident(baz)]
-		      [
-		       bind ident(baz) [record literal(person)
+		      [bind ident(baz) [record literal(person)
 					[
 					 [literal(age) ident(foo)]
 					]
@@ -132,19 +131,38 @@ Test10 =
   ]
  ]
 ]
-%currently testing
 %order changed in test10
+%fails, as expected (binding 40 to 42)
+
 Test11 = 
 [localvar ident(foo)
     [localvar ident(bar)
      [localvar ident(quux)
-      [[bind ident(bar) [subr [ident(baz)]
-        [bind [record literal(person) [literal(age) ident(foo)]] ident(baz)]]]
+      [[bind ident(bar) [proced [ident(baz)]
+			 [bind ident(baz)
+			  [record literal(person)
+			   [
+			    [literal(age) ident(foo)]
+			   ]
+			  ]
+			 ]
+			]
+	]
        [apply ident(bar) ident(quux)]
-       [bind [record literal(person) [literal(age) literal(40)]] ident(quux)]
+       [bind ident(quux)
+	[record literal(person)
+	 [
+	  [literal(age) literal(40)]
+	 ]
+	]
+       ]
        %% We'll check whether foo has been assigned the value by
        %% raising an exception here
-       [bind literal(42) ident(foo)]]]]]
+       [bind ident(foo) literal(42)]
+      ]
+     ]
+    ]
+]
 
 /*
 %%------------ Pattern Match -------------------
