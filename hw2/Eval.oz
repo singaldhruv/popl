@@ -157,10 +157,10 @@ fun {Eval Stack}
 				[] record|L|Pairs then
 				   {Unify ident(X) record|L|Pairs TopEnv}
 				   {Eval NStack}
-				[] true then
-					{Unify ident(X) true TopEnv}
+				[] literal(t) then
+					{Unify ident(X) literal(t) TopEnv}
 					{Eval NStack}
-				[] false then {Unify ident(X) false TopEnv}
+				[] literal(f) then {Unify ident(X) literal(f) TopEnv}
 				   {Eval NStack}
 				[] proced|Vars|S|nil then
 				   local FreeEnv CopyEnv in
@@ -181,9 +181,9 @@ fun {Eval Stack}
 		     case {RetrieveFromSAS TopEnv.X}
 		     of equivalence(_) then
 			raise conditionalOnUnbound(X) end
-		     [] true then
+		     [] literal(t) then
 			 {Eval {PushStack NStack semstmt(stmt:S1 env:TopEnv)}}
-		     [] false then
+		     [] literal(f) then
 			{Eval {PushStack NStack semstmt(stmt:S2 env:TopEnv)}}
 		     else raise conditionalOnNonBool(X) end
 		     end		
