@@ -66,24 +66,22 @@ Test6 =
     %% Check
     [bind ident(result) literal(f)]]]]
 
-{Inspect {Interpret Test4}}
-
-/*
-
 %%---------- Procedure definition and application ---------
-Test3 =
+Test7 =
 [localvar ident(x)
  [[bind ident(x)
-   [subr [ident(y) ident(x)] [nop]]]]
+   [proced [ident(y) ident(x)] [nop]]]]
  [apply ident(x) literal(1) literal(2)]]
 
+Test8 = 
 [localvar ident(x)
  [[bind ident(x)
-   [subr [ident(y) ident(x)] [nop]]]
+   [proced [ident(y) ident(x)] [nop]]]
   [apply ident(x)
    literal(1)
    [record literal(label) [literal(f1) literal(1)]]]]]
 
+Test9 = 
 [localvar ident(foo)
  [localvar ident(bar)
   [[bind ident(foo)
@@ -91,17 +89,21 @@ Test3 =
      [literal(name) ident(foo)]]]
    [bind ident(bar) [record literal(person) [literal(name) ident(bar)]]]
    [bind ident(foo) ident(bar)]]]]
-   
+%Test9 Fail
+
+Test10 = 
 [localvar ident(foo)
  [localvar ident(bar)
   [localvar ident(quux)
-   [[bind ident(bar) [subr [ident(baz)]
+   [[bind ident(bar) [proced [ident(baz)]
 		      [bind [record literal(person)
 			     [literal(age) ident(foo)]] ident(baz)]]]
     [apply ident(bar) ident(quux)]
     [bind [record literal(person) [literal(age) literal(40)]] ident(quux)]
     [bind literal(42) ident(foo)]]]]]
 
+{Inspect {Interpret Test10}}
+Test11 = 
 [localvar ident(foo)
     [localvar ident(bar)
      [localvar ident(quux)
@@ -113,6 +115,7 @@ Test3 =
        %% raising an exception here
        [bind literal(42) ident(foo)]]]]]
 
+/*
 %%------------ Pattern Match -------------------
 Test4 = 
 [localvar ident(x)
