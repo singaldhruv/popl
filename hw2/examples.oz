@@ -17,7 +17,7 @@ Test1 = [localvar ident(x)
 	      [literal(f1) ident(y)]
 	      [literal(f2) ident(z)]]]
 	    [bind ident(x)
-	     [record literal(label) [literal(f1) 2] [literal(f2) 1]]]]
+	     [record literal(label) [literal(f1) literal(2)] [literal(f2) literal(1)]]]]
 	  ]
 	 ]
 	]
@@ -36,20 +36,19 @@ Test3 = [localvar ident(foo)
 	   [bind ident(bar) [record literal(person) [literal(name) ident(bar)]]]
 	   [bind ident(foo) ident(bar)]]]]
 	   
-{Inspect {Interpret Test1}}
 
-   /*
 %%---------------- Conditional ---------------
-Test2 = 
+Test4 = 
 [localvar ident(x)
  [[localvar ident(y)
    [[localvar ident(x)
      [[bind ident(x) ident(y)]
       [bind ident(y) true]
-      [conditional ident(y)#nop
+      [conditional ident(y)
        [bind ident(x) true]]]]
     [bind ident(x) literal(35)]]]]]
 
+Test5 =
 [localvar ident(foo)
   [localvar ident(result)
    [[bind ident(foo) literal(t)]
@@ -58,7 +57,7 @@ Test2 =
     %% Check
     [bind ident(result) literal(t)]]]]
 
-
+Test6 =
 [localvar ident(foo)
   [localvar ident(result)
    [[bind ident(foo) literal(f)]
@@ -67,7 +66,9 @@ Test2 =
     %% Check
     [bind ident(result) literal(f)]]]]
 
+{Inspect {Interpret Test4}}
 
+/*
 
 %%---------- Procedure definition and application ---------
 Test3 =

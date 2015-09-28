@@ -25,8 +25,16 @@ fun {ComputeClosure Env Stmts EnvSoFar}
 	    {Record.adjoinAt NextEnv Y Env.Y}
 	 [] literal(Y) then NextEnv
 	 [] record|L|Pairs then
-	    NextEnv
-	%TODO!!!
+	    local RecordVars in
+	       fun{RecordVars Vars LocEnv}
+		  case Vars
+		  of literal(X)|ident(Y)|T then {RecordVars T {Record.adjoinAt LocEnv Y Env.Y}}
+		  [] H|T then {RecordVars T LocEnv}
+		  [] nil then LocEnv
+		  end
+	       end
+	       {RecordVars Pairs NextEnv}
+	    end
 	[] proced|Vars|S|nil then
 	    local EnvInner in
 	       EnvInner = {ComputeClosure {PutParams {Record.adjoin Env NextEnv} Vars} Stmts NextEnv}
@@ -41,8 +49,12 @@ fun {ComputeClosure Env Stmts EnvSoFar}
 	    {ComputeClosure Env S2 CombineEnv}
 	 end
       [] match|ident(X)|P|S1|S2|nil then
-	 NextEnv
-         %TODO
+	 NextEnv = {Record.adjoinAt EnvSoFar X Env.X }
+	 %TODO!! Discuss that resolving pattern match not needed
+	 local CombineEnv in
+	    CombineEnv = {ComputeClosure Env S1 NextEnv}
+	    {ComputeClosure Env S2 CombineEnv}
+	 end
       [] apply|ident(F)|Params then
 	 NextEnv = {Record.adjoinAt EnvSoFar F Env.F}
 	 local FuncParamsBind in
