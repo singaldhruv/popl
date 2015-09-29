@@ -1,4 +1,3 @@
-
 %==============
 % Code for unification
 %
@@ -34,7 +33,11 @@ in
       case Exp
       of H|T then  
 	 {SubstituteIdentifiers H Env}|{SubstituteIdentifiers T Env}
-      [] ident(X) then {RetrieveFromSAS Env.X}
+      [] ident(X) then
+	 if {Value.hasFeature Env X}
+	 then {RetrieveFromSAS Env.X}
+	 else raise notIntroduced(X) end
+	 end	    
       else Exp end
    end
 
@@ -64,12 +67,13 @@ in
       if {List.member [Exp1 Exp2] UnificationsSoFar}
       then skip
       else
-	 Unifications = {List.append [Exp1 Exp2] UnificationsSoFar}
+	 Unifications = {List.append [[Exp1 Exp2]] UnificationsSoFar}
 	 case Exp1
 	 of equivalence(X) then
 	    case Exp2
 	    of equivalence(Y) then {BindRefToKeyInSAS X Y}
-	    else {BindValueToKeyInSAS X Exp2} end
+	    else {BindValueToKeyInSAS X Exp2}
+	    end
 	 [] literal(X) then
 	    case Exp2
 	    of equivalence(_) then
@@ -85,8 +89,12 @@ in
 	       Canon1 = {Canonize Pairs1.1}
 	       Canon2 = {Canonize Pairs2.1}
 	    in
+	       
 	       {List.zip Canon1 Canon2
 		fun {$ X Y}
+		   if X.1 \= Y.1 then
+		      raise mismatchInFeatures(X.1 Y.1) end
+		   end
 		   {UnifyRecursive
 		    {WeakSubstitute X.2.1} {WeakSubstitute Y.2.1}
 		    Unifications}
@@ -105,6 +113,7 @@ in
    {UnifyRecursive {SubstituteIdentifiers Exp1 Env}
     {SubstituteIdentifiers Exp2 Env} nil}
 end
+
 
 
 
