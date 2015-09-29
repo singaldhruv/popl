@@ -231,9 +231,12 @@ fun {Eval Stack}
 													end
 													case PPair.2.1#XPair.2.1
 								   					of ident(PValue)#equivalence(XValue) then [PValue XValue]
-								   					%[] ident(PValue)#Value then skip 
-								   					%We will get a new key in SAS for PValue and bind the new key in SAS to Value
-								   					%and bind the new key to PValue in Env.
+								   					[] ident(PValue)#Value then
+								   						local TempKey in 
+								   							TempKey = {AddKeyToSAS}
+								   							{BindValueToKeyInSAS TempKey Value}
+								   							[PValue TempKey]
+								   						end
 								   					else raise invalidPattern end
 								   					end
 												end
