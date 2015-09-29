@@ -12,56 +12,61 @@ end
 
 %Implementing closures -> copy the old bindings from variables used in function except those of bound vars
 fun {ComputeClosure Env Stmts EnvSoFar}
-   local NextEnv in
+try
+   local NextEnv AdjoinedEnv = {Record.adjoin Env EnvSoFar} in
       case Stmts
       of nop then EnvSoFar
       [] localvar|ident(X)|S then
 	 NextEnv = {ComputeClosure Env S {Record.adjoinAt EnvSoFar X undefined}}
 	 {Record.subtract NextEnv X}
       [] bind|ident(X)|V|nil then
-	 NextEnv = {Record.adjoinAt EnvSoFar X Env.X}
+	 	NextEnv = {Record.adjoinAt EnvSoFar X AdjoinedEnv.X}
 	 case V
 	 of ident(Y) then
-	    {Record.adjoinAt NextEnv Y Env.Y}
+	    {Record.adjoinAt NextEnv Y AdjoinedEnv.Y}
 	 [] literal(Y) then NextEnv
 	 [] record|L|Pairs then
 	    local RecordVars Test in
 	       fun{RecordVars Vars LocEnv}
 		  case Vars
-		  of [literal(X) ident(Y)]|T then {RecordVars T {Record.adjoinAt LocEnv Y Env.Y}}
+		  of [literal(X) ident(Y)]|T then 
+     	 {RecordVars T {Record.adjoinAt LocEnv Y AdjoinedEnv.Y}}
 		  [] H|T then {RecordVars T LocEnv}
 		  [] nil then LocEnv
 		  end
 	       end
 	       %TODO confirm (works with Pairs.1)
-	       {RecordVars Pairs.1 NextEnv}
+	      	{RecordVars Pairs.1 NextEnv}
 	    end
 	[] proced|Vars|S|nil then
 	    local EnvInner in
-	       EnvInner = {ComputeClosure {PutParams {Record.adjoin Env NextEnv} Vars} Stmts NextEnv}
+	       EnvInner = {ComputeClosure {PutParams {Record.adjoin Env NextEnv} Vars} S NextEnv}
 	       {RemoveParams EnvInner Vars}
 	    end
 	else NextEnv %literal, true, false
 	end
+
       [] conditional|ident(X)|S1|S2 then
-	 NextEnv = {Record.adjoinAt EnvSoFar X Env.X }
+	 NextEnv = {Record.adjoinAt EnvSoFar X AdjoinedEnv.X }
 	 local CombineEnv in
 	    CombineEnv = {ComputeClosure Env S1 NextEnv}
 	    {ComputeClosure Env S2 CombineEnv}
 	 end
       [] match|ident(X)|P|S1|S2|nil then
-	 NextEnv = {Record.adjoinAt EnvSoFar X Env.X }
-	 %TODO!! Discuss that resolving pattern match not needed
+	 NextEnv = {Record.adjoinAt EnvSoFar X AdjoinedEnv.X }
+	 
 	 local CombineEnv in
 	    CombineEnv = {ComputeClosure Env S1 NextEnv}
 	    {ComputeClosure Env S2 CombineEnv}
 	 end
       [] apply|ident(F)|Params then
-	 NextEnv = {Record.adjoinAt EnvSoFar F Env.F}
+	 NextEnv = {Record.adjoinAt EnvSoFar F AdjoinedEnv.F}
 	 local FuncParamsBind in
 	    fun{FuncParamsBind Params BindEnv}
 	       case Params
-	       of ident(H)|T then {Record.adjoinAt {FuncParamsBind T BindEnv} H Env.H}
+	       of ident(H)|T then 
+     	 {Record.adjoinAt {FuncParamsBind T BindEnv} H AdjoinedEnv.H}
+	       [] Value|T then {FuncParamsBind T BindEnv}
 	       [] nil then BindEnv
 	       end
 	    end
@@ -73,6 +78,9 @@ fun {ComputeClosure Env Stmts EnvSoFar}
       [] nil then EnvSoFar
       end
     end
+ catch _ then
+ 	raise notIntroduced end
+ end
 end      
 
 fun {RemoveParams OldEnv List}
@@ -87,18 +95,19 @@ fun {PutParams OldEnv List}
    case List
    of ident(H)|T then {PutParams {Record.adjoinAt OldEnv H undefined} T}
    [] nil then OldEnv
+   else raise definitionError end
    end
 end
 
 %Bind formal to actual
 fun {BindParams Actual Formal FunEnv CallEnv}
    case Actual#Formal
-   of (ident(Ha)|Ta)#(ident(Hf)|Tf) then
+   of ident(Ha)|Ta#ident(Hf)|Tf then
       if {Value.hasFeature CallEnv Ha} then
 	 {BindParams Ta Tf {Record.adjoinAt FunEnv Hf CallEnv.Ha} CallEnv}
       else raise notIntroduced(Ha) end
       end
-   [] (X|Ta)#(ident(Hf)|Tf) then % X could be literal or record
+   [] X|Ta#ident(Hf)|Tf then % X could be literal or record
       local TempKey NewEnv in
 	 TempKey = {AddKeyToSAS}
 	 NewEnv = {Record.adjoinAt FunEnv Hf TempKey}
@@ -164,13 +173,17 @@ fun {Eval Stack}
 				[] literal(f) then {Unify ident(X) literal(f) TopEnv}
 				   {Eval NStack}
 				[] proced|Vars|S|nil then
-				   local FreeEnv CopyEnv in
-				      {Record.adjoin env() TopEnv CopyEnv} %Create a copy
-				      FreeEnv = {ComputeClosure {PutParams CopyEnv Vars} S env()}				 
-				      %Put params for computing closure, compute closure and then remove the params
-				      {BindValueToKeyInSAS TopEnv.X func(def:[proced Vars S] closure:{RemoveParams FreeEnv Vars})}
-				   end
-				   {Eval NStack}
+				   case {RetrieveFromSAS TopEnv.X}
+				   of equivalence(_) then
+				      local FreeEnv CopyEnv in
+					 CopyEnv = {Record.adjoin env() TopEnv} %Create a copy
+					 FreeEnv = {ComputeClosure {PutParams CopyEnv Vars} S env()}				 
+				         %Put params for computing closure, compute closure and then remove the params
+					 {BindValueToKeyInSAS TopEnv.X func(def:[proced Vars S] closure:{RemoveParams FreeEnv Vars})}
+				      end
+				      {Eval NStack}
+				   else raise alreadyAssigned(X) end
+				   end				   
 				else raise invalidExpression(ident(X) V) end
 		  		end				  
 	    	else raise notIntroduced(X) end
@@ -218,6 +231,9 @@ fun {Eval Stack}
 													end
 													case PPair.2.1#XPair.2.1
 								   					of ident(PValue)#equivalence(XValue) then [PValue XValue]
+								   					%[] ident(PValue)#Value then skip 
+								   					%We will get a new key in SAS for PValue and bind the new key in SAS to Value
+								   					%and bind the new key to PValue in Env.
 								   					else raise invalidPattern end
 								   					end
 												end
@@ -250,9 +266,10 @@ fun {Eval Stack}
 		     case {RetrieveFromSAS TopEnv.F}
 		     of func(def:proced|Vars|Stmt closure:C) then
 			try FuncEnv = {BindParams Params Vars C TopEnv}
+			   {Eval {PushStack NStack semstmt(stmt:Stmt env:FuncEnv)} }
 			catch mismatchedArgCount then raise mismatchedArgCount(F formal#Params actual#Vars) end
 			end
-			{Eval {PushStack NStack semstmt(stmt:Stmt env:FuncEnv)} }
+			
 			
 		     else raise notAFunction(F) end
 		     end
