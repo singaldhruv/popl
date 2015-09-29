@@ -22,4 +22,6 @@ CS350A (Principles of Programming Languages) - Homework 2, Part 2
     - The case [bind value ident(X)] is not supported and [bind ident(X) value] is supported.
     - Booleans for conditionals are supported by using `literal(t)` and `literal(f)` as reserved keywords.
     - Procedure definitions must have variables as formal parameters.
+* Computation of closure is done by  function `ComputeClosure` according to the rules specific to each type of statement.
+* Full functionality of pattern matching is supported for records.
 
