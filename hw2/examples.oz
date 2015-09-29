@@ -8,7 +8,7 @@
 \insert  'Eval.oz'
 %%-------------- Record bind ----------------
 
-declare Test1 Test2 Test3 Test4 Test5 Test6 Test7 Test8 Test9 Test10 Test11 in
+declare Test1 Test2 Test3 Test4 Test5 Test6 Test7 Test8 Test9 Test10 Test11 Test12 Test13 Test14 Test15 in
 Test1 = [localvar ident(x)
 	 [localvar ident(y)
 	  [localvar ident(z)
@@ -164,21 +164,33 @@ Test11 =
     ]
 ]
 
-/*
 %%------------ Pattern Match -------------------
-Test4 = 
+Test12 = 
 [localvar ident(x)
  [[bind ident(x)
    [record literal(label)
-    [literal(f1) literal(1)]
-    [literal(f2) literal(2)]]]
+    [
+     [literal(f1) literal(1)]
+     [literal(f2) literal(2)]
+    ]
+   ]
+  ]
   [match ident(x)
    [record literal(label)
-    [literal(f1) literal(1)]
-    [literal(f2) literal(2)]]#[nop] [nop]]]]
-   
+    [
+     [literal(f1) literal(1)]
+     [literal(f2) literal(2)]
+    ]
+    [nop]
+    [nop]
+   ]
+  ]
+ ]
+]
 
-   
+{Inspect {Interpret Test12}}   
+
+Test13 = 
 [localvar ident(foo)
  [localvar ident(result)
   [[bind ident(foo) [record literal(bar)
@@ -192,6 +204,7 @@ Test4 =
    [bind ident(result) literal(42)]
    [nop]]]]
 
+Test14 = 
 [localvar ident(foo)
   [localvar ident(bar)
    [localvar ident(baz)
@@ -202,7 +215,8 @@ Test4 =
      %% Check
      [bind ident(baz) literal(f)]
      [nop]]]]]
-   
+
+Test15 = 
 [localvar ident(foo)
   [localvar ident(bar)
    [localvar ident(baz)
@@ -216,5 +230,3 @@ Test4 =
       [bind ident(result) literal(25)]]]]]]
 
 
-
-*/
