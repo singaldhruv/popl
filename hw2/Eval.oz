@@ -102,12 +102,12 @@ end
 %Bind formal to actual
 fun {BindParams Actual Formal FunEnv CallEnv}
    case Actual#Formal
-   of ident(Ha)|Ta#ident(Hf)|Tf then
+   of (ident(Ha)|Ta)#(ident(Hf)|Tf) then
       if {Value.hasFeature CallEnv Ha} then
 	 {BindParams Ta Tf {Record.adjoinAt FunEnv Hf CallEnv.Ha} CallEnv}
       else raise notIntroduced(Ha) end
       end
-   [] X|Ta#ident(Hf)|Tf then % X could be literal or record
+   [] (X|Ta)#(ident(Hf)|Tf) then % X could be literal or record
       local TempKey NewEnv in
 	 TempKey = {AddKeyToSAS}
 	 NewEnv = {Record.adjoinAt FunEnv Hf TempKey}

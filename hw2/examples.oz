@@ -14,26 +14,36 @@ Test1 = [localvar ident(x)
 	  [localvar ident(z)
 	   [[bind ident(x)
 	     [record literal(label)
-	      [literal(f1) ident(y)]
-	      [literal(f2) ident(z)]]]
+	      [
+	      	[literal(f1) ident(y)]
+	      	[literal(f2) ident(z)]
+	      ]
+	     ]
+	     ]
 	    [bind ident(x)
-	     [record literal(label) [literal(f1) literal(2)] [literal(f2) literal(1)]]]]
+	     [record literal(label) [
+	     [literal(f1) literal(2)]
+	     [literal(f2) literal(1)]
+	     	]
+	     ]
+	    ]
 	  ]
 	 ]
+	]
 	]
 
 
 Test2 = [localvar ident(foo)
 	 [localvar ident(bar)
-	  [[bind ident(foo) [record literal(person) [literal(name) ident(bar)]]]
-	   [bind ident(bar) [record literal(person) [literal(name) ident(foo)]]]
+	  [[bind ident(foo) [record literal(person) [[literal(name) ident(bar)]]]]
+	   [bind ident(bar) [record literal(person) [[literal(name) ident(foo)]]]]
 	   [bind ident(foo) ident(bar)]]]]
 
 	   
 Test3 = [localvar ident(foo)
 	 [localvar ident(bar)
-	  [[bind ident(foo) [record literal(person) [literal(name) ident(foo)]]]
-	   [bind ident(bar) [record literal(person) [literal(name) ident(bar)]]]
+	  [[bind ident(foo) [record literal(person) [[literal(name) ident(foo)]]]]
+	   [bind ident(bar) [record literal(person) [[literal(name) ident(bar)]]]]
 	   [bind ident(foo) ident(bar)]]]]
 	   
 
@@ -45,7 +55,11 @@ Test4 =
      [[bind ident(x) ident(y)]
       [bind ident(y) literal(t)]
       [conditional ident(y)
-       [bind ident(x) literal(t)]]]]
+       [bind ident(x) literal(t)]
+       [nop]
+       ]
+       ]
+     ]
     [bind ident(x) literal(35)]]]]]
 
 Test5 =
@@ -78,11 +92,16 @@ Test7 =
 Test8 = 
 [localvar ident(x)
  [[bind ident(x)
-   [proced [ident(y) ident(x)] [nop]]]
+   [proced [ident(y) ident(x)] [nop]]
+   ]
   [apply ident(x)
    literal(1)
-   [record literal(label) [literal(f1) literal(1)]]]]]
+   [record literal(label) [[literal(f1) literal(1)]]]
+   ]
+ ]
+]
 
+%should not be here! duh
 Test9 = 
 [localvar ident(foo)
  [localvar ident(bar)
@@ -92,8 +111,8 @@ Test9 =
 		      [literal(name) ident(foo)]
 		     ]
 		    ]
-   ]
-   [
+	   ]
+	   [
     bind ident(bar) [record literal(person)
 		     [
 		      [literal(name) ident(bar)]
@@ -181,52 +200,101 @@ Test12 =
      [literal(f1) literal(1)]
      [literal(f2) literal(2)]
     ]
-    [nop]
-    [nop]
    ]
+    [nop]
+    [nop]
   ]
  ]
 ]
 
-{Inspect {Interpret Test12}}   
-
 Test13 = 
 [localvar ident(foo)
  [localvar ident(result)
-  [[bind ident(foo) [record literal(bar)
-		     [literal(baz) literal(42)]
-		     [literal(quux) literal(314)]]]
-   [match ident(foo) [record literal(bar)
-		      [literal(baz) ident(fortytwo)]
-		      [literal(quux) ident(pitimes100)]]#[bind ident(result) ident(fortytwo)] %% if matched
-    [bind ident(result) literal(314)]]
+  [
+  	[bind ident(foo) 
+  		[record literal(bar)
+		    [
+		    	[literal(baz) literal(42)]
+		     	[literal(quux) literal(314)]
+		 	]
+		]
+	]
+   [match ident(foo) 
+   		[record literal(bar)
+		      [
+		      	[literal(baz) ident(fortytwo)]
+		      	[literal(quux) ident(pitimes100)]
+		      ]
+		]
+		[bind ident(result) ident(fortytwo)] %% if matched
+    	[bind ident(result) literal(314)]
+    ]
     %% This will raise an exception if result is not 42
    [bind ident(result) literal(42)]
-   [nop]]]]
+   [nop]
+   ]
+  ]
+]
+
+
+
 
 Test14 = 
 [localvar ident(foo)
   [localvar ident(bar)
    [localvar ident(baz)
-    [[bind ident(foo) ident(bar)]
-     [bind literal(20) ident(bar)]
-     [match ident(foo) literal(21)#[bind ident(baz) literal(t)]
-      [bind ident(baz) literal(f)]]
+    [
+     [bind ident(foo) ident(bar)]
+     [bind ident(bar) 
+     	[record literal(myRecord)
+     		[ 
+     			[literal(onlyField) literal(20)]
+     		]
+     	]
+     ]
+     [match ident(foo) 
+    	[record literal(myRecord)
+     		[ 
+     			[literal(onlyField) literal(21)]
+     		]
+     	]
+     	[bind ident(baz) literal(t)]
+      	[bind ident(baz) literal(f)]
+     ]
      %% Check
      [bind ident(baz) literal(f)]
-     [nop]]]]]
+     [nop]
+    ]
+   ]
+  ]
+ ]
+
 
 Test15 = 
 [localvar ident(foo)
   [localvar ident(bar)
    [localvar ident(baz)
     [localvar ident(result)
-     [[bind ident(foo) literal(person)]
-      [bind ident(bar) literal(age)]
-      [bind ident(baz) [record literal(person) [literal(age) literal(25)]]]
-      [match ident(baz) [record ident(foo) [ident(bar) ident(quux)]]#[bind ident(result) ident(quux)]
-       [bind ident(result) literal(f)]]
-      %% Check
-      [bind ident(result) literal(25)]]]]]]
+     [
+     	[bind ident(foo) literal(person)]
+      	[bind ident(bar) literal(age)]
+      	[bind ident(baz) [record literal(person) 
+      						[
+      							[literal(age) literal(25)]
+      						]
+      					 ]
+      	]
+      	[match ident(baz) [record literal(person) 
+      				[literal(age) ident(quux)]
+      				]
+      		[bind ident(result) ident(quux)]
+       	[bind ident(result) literal(f)]
+       	]
+      	%% Check
+      	[bind ident(result) literal(25)]]
+     ]
+    ]
+   ]
+]
 
-
+{Inspect {Interpret Test9}}
