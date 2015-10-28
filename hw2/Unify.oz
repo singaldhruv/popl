@@ -1,4 +1,4 @@
-%==============
+ %==============
 % Code for unification
 %
 % Unify two expressions. An expression can be

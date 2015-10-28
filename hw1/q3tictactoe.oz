@@ -74,12 +74,12 @@ local WhoWon Won WonRow WonCol WonDiag RowSame ColSame Nth WonLeadD BoardRev in
       TestB1 = [ [x x o] [x o o] [o o x] ]
       /*
       o x o
-      x x x
-      o o x
+      x o x
+      x o x
       */
-      TestB2 = [[o x o] [x x x] [o o x]]
+      TestB2 = [[o x s] [s s s] [s s s]]
       %{Browse {WhoWon TestB1} == o}
-      %{Browse {WhoWon TestB2} == x}
+      %{Browse {WhoWon TestB2}}
    end
 end
 
@@ -144,7 +144,7 @@ local AllBoards RepS RepsAux Cross1 Cross2 Cross3 in
       */
       TestB2 = [[o s s] [x s o] [x o x]]
       
-      %{Browse {AllBoards o TestB1} }
+      {Browse {AllBoards o TestB1} }
       %{Browse {AllBoards x TestB2}}
    end
 end

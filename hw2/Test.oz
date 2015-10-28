@@ -1,13 +1,13 @@
 
 \insert 'Eval.oz'
 
-/*
+
 %Test for compound statements
 local Test1 in
      Test1 = [[[nop]] [nop]]
      {Inspect {Interpret Test1}}
 end
-*/      
+      
 
 %Test for localvar introduction
 /*local Test2 in

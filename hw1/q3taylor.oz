@@ -9,7 +9,7 @@ local Sin SinUptoN SinUptoEpsilon SinAux in
       end
    end
    
-   %{Browse {Sin 1.2}}
+   {Browse {Sin 1.2}}
 
    fun {SinUptoN X N}
       local SinAux Xs = {Sin X} in
@@ -24,7 +24,7 @@ local Sin SinUptoN SinUptoEpsilon SinAux in
    end
 
    %Please note that the argument X to the function SinUptoN is a float!
-   %{Browse {SinUptoN 2.0 10}}
+   %{Browse {SinUptoN 0.5 5}}
 
    fun {SinUptoEpsilon X Epsilon}
       local SinAux Xs = {Sin X} in
@@ -39,7 +39,7 @@ local Sin SinUptoN SinUptoEpsilon SinAux in
    end
 
    %Please note that the arguments X and Epsilon to the function SinUptoEpsilon are floats!
-   %{Browse {SinUptoEpsilon 2.0 0.01}}
+   {Browse {SinUptoEpsilon 2.0 0.01}}
 end
 
       

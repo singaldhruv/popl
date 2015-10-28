@@ -15,11 +15,11 @@ local ZipWith in
    /*
     *Tests Zipwith
     *Library BinOp: Max
-   */
    
-   %{Browse {ZipWith Max [1 2 3] [2 1 5]} == [2 2 5] }
-   %{Browse {ZipWith fun {$ A B} A+B end  nil [1 2]} == nil }
-   %{Browse {ZipWith fun {$ A B} A*B end  [4 5 5] [1 6]} == [4 30] }
+   
+   {Browse {ZipWith Max [1 2 3] [2 1 5]} == [2 2 5] }
+   {Browse {ZipWith fun {$ A B} A+B end  nil [1 2]} == nil }
+   {Browse {ZipWith fun {$ A B} A*B end  [4 5 5] [1 6]} == [4 30] }*/
 end
 
 local Map FoldR in
@@ -36,8 +36,8 @@ local Map FoldR in
    end
 
    %Tests Map
-   %{Browse {Map [1 2 3] fun {$ X} 2*X end } == [2 4 6] }
-   %{Browse {Map nil fun {$ X} X*X end} == nil }
+   {Browse {Map [1 2 3] fun {$ X} 2*X end } == [2 4 6] }
+   {Browse {Map nil fun {$ X} X*X end} == nil }
 end
 
     
@@ -50,9 +50,9 @@ local FoldL in
       end
    end
 
-   /*Tests FoldL*/
-   %{Browse {FoldL [1 2 3] fun {$ X Y} X+Y end 0} == 6 }
-   %{Browse {FoldL [1 2 3] fun {$ X Y} X*Y end 1} == 6}
+   /*Tests FoldL
+   {Browse {FoldL [1 2 3] fun {$ X Y} X+Y end 0} == 6 }
+   {Browse {FoldL [1 2 3] fun {$ X Y} X*Y end 1} == 6}*/
 
 end
    

@@ -13,14 +13,14 @@ local Take A in
    end
    % Tests
    A = [1 2 3 4]
-   %{Browse {Take A ~1} == nil}
-   %{Browse {Take A 0} == nil}
-   %{Browse {Take A 1} == [1]}
-   %{Browse {Take A 2} == [1 2]}
-   %{Browse {Take A 3} == [1 2 3]}
-   %{Browse {Take A 4} == [1 2 3 4]}
-   %{Browse {Take A 5} == A}
-   
+   /*{Browse {Take A ~1} == nil}
+   {Browse {Take A 0} == nil}
+   {Browse {Take A 1} == [1]}
+   {Browse {Take A 2} == [1 2]}
+   {Browse {Take A 3} == [1 2 3]}
+   {Browse {Take A 4} == [1 2 3 4]}
+   {Browse {Take A 5} == A}
+   */
 end
 
 local Length Drop DropComp in
@@ -49,10 +49,10 @@ local Length Drop DropComp in
       end
    end
    
-   /* Tests Drop */
-   %{Browse {Drop [5 1 2] 2} == [1 2] }
-   %{Browse {Drop [1 4] 3} == nil }
-   %{Browse {Drop [1 2] 0} == [1 2] }
+   /* Tests Drop 
+   {Browse {Drop [5 1 2] ~2}== [1 2] }
+   {Browse {Drop [1 4] 3} == nil }
+   {Browse {Drop [1 2] 0} == [1 2] }*/
 end
 
 local Merge in
@@ -69,8 +69,8 @@ local Merge in
       end
    end
    /* Tests Merge */
-   %{Browse {Merge [1 2 3] [2 4]} == [1 2 2 3 4] }
-   %{Browse {Merge nil [1 2]} == [1 2] }
-   %{Browse {Merge [1 3] nil} == [1 3] }
+   {Browse {Merge [3 2 1] [2 4]} }
+   {Browse {Merge nil [1 2]} == [1 2] }
+   {Browse {Merge [1 3] nil} == [1 3] }
 end
 
