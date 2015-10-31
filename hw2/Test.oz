@@ -176,9 +176,9 @@ local Test11 Test12 in
                  ]
 		]
 
-		[apply ident(bar) ident(quux)]
+		[apply ident(bar) ident(quux) ident(quux)]
 		[bind ident(quux)  [record literal(person) [[literal(age) literal(40)]]]]
-		[bind ident(foo) literal(42) ]
+		[bind ident(foo) literal(40) ]
 	       ]
 	      ]
 	     ]
