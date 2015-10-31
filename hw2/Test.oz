@@ -24,7 +24,7 @@ local Test3 in
 end
 */
 
-/*
+
 %Test for variable-literal binding
 local Test4 Test5 Test6 Test7 in
    
@@ -60,7 +60,7 @@ local Test4 Test5 Test6 Test7 in
 	    [ localvar ident(x)
 	      [ localvar ident(y)
 		[
-		 [bind ident(x) [record literal(recordMe) [ [literal(myFirst) ident(y)] ]]]
+		 [bind ident(x) [record literal(recordMe) [ [literal(myFirst) ident(x)] ]]]
 		 [bind ident(y) [record literal(recordMe) [ [literal(myFirst) ident(x)] ]]]
 		]
 	      ]
@@ -85,9 +85,9 @@ local Test4 Test5 Test6 Test7 in
 	    ]
 	   ]
     
-   {Inspect {Interpret Test5}}
+   %{Inspect {Interpret Test6}}
 end
-*/
+
 /*
 
 %Test for condtionals
@@ -143,7 +143,7 @@ local Test10 in
    Test10 = [localvar ident(x)
 	     [localvar ident(y)
 	      [
-	       [bind ident(x) [proced [ident(y)] y]]
+	       [bind ident(x) [proced [ident(y)] ]]
 	      ]
 	     ]
 	    ]
@@ -156,7 +156,8 @@ local Test11 in
    Test11 = [localvar ident(x)
 	     [localvar ident(y)
 	      [bind ident(x) [proced [ident(w)]
-			       [bind ident(w) literal(1)]
+			       %[bind ident(w) literal(1)]
+			       [apply ident(x) ident(w)]
 			      ]
 	      ]
 	      [apply ident(x) ident(y)] 
