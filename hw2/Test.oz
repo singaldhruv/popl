@@ -3,11 +3,11 @@
 
 
 %Test for compound statements
-local Test1 in
+/*local Test1 in
      Test1 = [[[nop]] [nop]]
      {Inspect {Interpret Test1}}
 end
-      
+*/      
 
 %Test for localvar introduction
 /*local Test2 in
@@ -24,7 +24,7 @@ local Test3 in
 end
 */
 
-/*
+
 %Test for variable-literal binding
 local Test4 Test5 Test6 Test7 in
    
@@ -85,10 +85,10 @@ local Test4 Test5 Test6 Test7 in
 	    ]
 	   ]
     
-   {Inspect {Interpret Test5}}
+   %{Inspect {Interpret Test6}}
 end
-*/
-/*
+
+
 
 %Test for condtionals
 local Test8 in
@@ -96,20 +96,21 @@ local Test8 in
 	    [ localvar ident(x)
 	      [ localvar ident(y)
 		[
-		 [bind ident(x) false]
+		 [bind ident(x) literal(t)]
 		 [conditional ident(x)
-		  [bind ident(y) literal(1)]
+		  [bind ident(yy) literal(1)]
 		  [bind ident(y) literal(0)]
 		 ]
+		 [bind ident(y) literal(0)]
 		]
 	      ]
 	    ]
 	   ]
 
-   {Inspect {Interpret Test8}}
+   %{Inspect {Interpret Test8}}
 end
    
-	   */
+
 
 /*
 %Test for pattern matching
@@ -152,7 +153,7 @@ local Test10 in
 end
 */
 
-local Test11 in
+local Test11 Test12 in
    Test11 = [localvar ident(x)
 	     [localvar ident(y)
 	      [bind ident(x) [proced [ident(w)]
@@ -162,5 +163,27 @@ local Test11 in
 	      [apply ident(x) ident(y)] 
 	     ]
 	    ]
-   {Inspect {Interpret Test11}}
+
+   Test12 = [localvar ident(foo)
+	     [localvar ident(bar)
+	      [localvar ident(quux)
+	       [
+		[bind ident(bar)
+		 [proced [ident(baz)]
+		  [
+		   [bind ident(baz) [record literal(person) [[literal(age) ident(foo)]] ]]
+		  ]
+                 ]
+		]
+
+		[apply ident(bar) ident(quux)]
+		[bind ident(quux)  [record literal(person) [[literal(age) literal(40)]]]]
+		[bind ident(foo) literal(42) ]
+	       ]
+	      ]
+	     ]
+	    ]
+
+   
+   {Inspect {Interpret Test12}}
 end
