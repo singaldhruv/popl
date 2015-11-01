@@ -1,4 +1,4 @@
-declare LazyQuickSort LazyFilter LazyAppend in
+declare EagerPrint LazyQuickSort LazyFilter LazyAppend in
 
 fun lazy  {LazyAppend Xs Ys}
    case Xs
@@ -31,4 +31,13 @@ fun lazy {LazyQuickSort Xs}
    end
 end
 
-{Browse {LazyQuickSort [2 1 3 5 5 2]}.2.2.2.1}
+proc {EagerPrint L}
+   if L \= nil then
+      {Browse L.1|L.2}
+      {Delay 1000}
+      {EagerPrint L.2}
+   else {Browse L.1}
+   end
+end
+
+{EagerPrint {LazyQuickSort [2 1 3 5 5 2]}}

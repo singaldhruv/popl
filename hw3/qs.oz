@@ -30,19 +30,22 @@ end
 %%%
 
 fun lazy {LQuickSort Xs}
-   if Xs.2 == nil then Xs.1
-   else
-	local Lset Rset in
-	    Lset = {LFilter
-		    fun {$ A} A =< Xs.1 end
-		    Xs}
-	    Rset = {LFilter
-		    fun {$ A} A > Xs.1 end
-		    Xs}
-	    {LAppend {LQuickSort Lset} {LQuickSort Rset}}
+   if Xs == nil then nil 
+   else if Xs.2 == nil then Xs
+	else
+	   local Lset Rset in
+	      Lset = {LFilter
+		      fun {$ A} A =< Xs.1 end
+		      Xs}
+	      Rset = {LFilter
+		      fun {$ A} A > Xs.1 end
+		      Xs}
+	      {LAppend {LQuickSort Lset} {LQuickSort Rset}}
+	   end
 	end
-   end
+      end
 end
+
 fun lazy {LFilter F X}
     case X
     of nil then nil
@@ -56,5 +59,6 @@ fun lazy {LFilter F X}
 end
 
 local Test1 in
-    Test1 = {LQuickSort [2 4 3 6 1]}
+   Test1 = {LQuickSort [2 4 3 6 1]}
+   {Browse Test1.2.1}
 end
