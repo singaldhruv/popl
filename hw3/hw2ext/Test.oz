@@ -162,5 +162,20 @@ local Test11 in
 	      [apply ident(x) ident(y)] 
 	     ]
 	    ]
-   {Inspect {Interpret Test11}}
+  % {Inspect {Interpret Test11}}
 end
+
+local Test12 in
+   Test12 = [localvar ident(x)
+	     [
+	      [bind ident(x) 1]
+	      [threadt
+	       [bind ident(x) 1]
+	       endt
+	      ]
+	     ]
+	    ]
+   {Inspect {Interpret Test12}}
+end
+
+   
