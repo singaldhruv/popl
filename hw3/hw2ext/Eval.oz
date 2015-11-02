@@ -302,28 +302,33 @@ end
 end
 
 fun {CanStackUnsuspend Stack}
-   local TopSemStmt TopStmt TopEnv Ret in
-      TopSemStmt = {TopStack Stack}
-      TopStmt = TopSemStmt.stmt
-      TopEnv = TopSemStmt.env
-      case TopStmt
-      of conditional|ident(X)|S1|S2 then
-	 if {Value.hasFeature TopEnv X} then Ret = true
-	 else Ret = false end
+   if Stack == nil then true
+   else
+    local TopSemStmt TopStmt TopEnv Ret in
+	TopSemStmt = {TopStack Stack}
+	TopStmt = TopSemStmt.stmt
+	TopEnv = TopSemStmt.env
+	case TopStmt
+	of conditional|ident(X)|S1|S2 then
+	    local Val in
+		case {RetrieveFromSAS TopEnv.X}
+		of equivalence(_) then Ret = false
+		else Ret = true end
+	    end
+	[] match|ident(X)|P|S1|S2|nil then
+	    %Suspend => Exists in SAS
+	    case {RetrieveFromSAS TopEnv.X}
+	    of equivalence(_) then
+		Ret = false
+	    [] record|LabelX|PairsX then
+		Ret = true
+	    end
 
-      [] match|ident(X)|P|S1|S2|nil then
-	%Suspend => Exists in SAS
-	 case {RetrieveFromSAS TopEnv.X}
-	 of equivalence(_) then
-	    Ret = false
-	 [] record|LabelX|PairsX then
-	    Ret = true
-	 end
-
-      else Ret = true 
-      end
-    %no condition meets (Unreachable)
-      Ret
+	else Ret = true 
+	end
+	%no condition meets (Unreachable)
+	Ret
+    end
    end
 end
 
@@ -338,31 +343,33 @@ end
 
 fun {EvalMltTh MStack SuspendL}
    local Stack TopSemStmt TopStmt TopEnv NStack in
-      {Browse MStack}
-      {Browse SuspendL}
+      {Inspect MStack}
+      {Inspect SuspendL}
       {Inspect {Dictionary.entries SAS}}
       if MStack == nil then allThreadsDone
       else
 	 Stack = {TopStack MStack}
 	 TopSemStmt = {TopStack Stack}
-            %TopSemStmt contains the top semantic statement
 	 if TopSemStmt == nil then
-                            %This thread is over
+	                %This thread is over
 	    {EvalMltTh {PopStack MStack} {PopStack SuspendL}}
 	 else
+            %TopSemStmt contains the top semantic statement
 	    TopStmt = TopSemStmt.stmt
 	    TopEnv = TopSemStmt.env
 	    {Inspect TopStmt}
 	    case TopStmt
-	    of threadt|S then
-	       {Browse threading}
+	    of threadt|S|endt|nil then
 	       local NewStack CurStack NewMStack in
 		  NewStack = [semstmt(stmt:S env:TopEnv)]
 		  CurStack = {PopStack Stack}
-		  {Inspect CurStack}
-		  NewMStack = {PushStack {PushStack {PopStack MStack} CurStack} NewStack}
-		  
-		  {EvalMltTh NewMStack {PushStack SuspendL false}}
+		  if CurStack \= nil then
+		     NewMStack = {PushStack {PushStack {PopStack MStack} CurStack} NewStack}
+		     {EvalMltTh NewMStack {PushStack SuspendL false}}
+		  else
+		     NewMStack = {PushStack {PopStack MStack} NewStack}
+		     {EvalMltTh NewMStack SuspendL}
+		  end
 	       end
 
 	    else
@@ -397,8 +404,8 @@ fun {EvalMltTh MStack SuspendL}
 		     if {CanMStackUnsuspend MStack} then
                          %There is some thread which can be unsuspended
                          %Cycle the threads 
-			NewSuspendL = {AppendStack {PopStack SuspendL} true}
-			NewMStack = {AppendStack {PopStack MStack} Stack}
+			NewSuspendL = {AppendStack {PopStack SuspendL} [true] }
+			NewMStack = {AppendStack {PopStack MStack} [Stack]}
 			{EvalMltTh NewMStack NewSuspendL}
 		     else raise allThreadsSuspended end  %all threads suspended
 		     end
@@ -410,5 +417,6 @@ fun {EvalMltTh MStack SuspendL}
       end
    end
 end
+
                
                

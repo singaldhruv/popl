@@ -1,4 +1,3 @@
-
 \insert 'Eval.oz'
 
 
@@ -165,7 +164,7 @@ local Test11 in
   % {Inspect {Interpret Test11}}
 end
 
-local Test12 in
+local Test12 Test13 Test14 in
    Test12 = [localvar ident(x)
 	     [
 	      [bind ident(x) literal(1)]
@@ -173,9 +172,51 @@ local Test12 in
 	       [
 		[bind ident(x) literal(1)]
 	       ]
+	       endt
 	      ]
 	     ]
 	    ]
-   {Inspect {Interpret Test12}}
+   %Test13 Suspends all
+   Test13 = [localvar ident(x)
+	     [localvar ident(y)
+	      [
+		[threadt
+			[
+			    [conditional ident(x)
+				[bind ident(y) literal(1)]
+				[bind ident(y) literal(0)]
+			    ]
+			]
+		 endt
+		]
+	       ]
+	     ]
+	    ]
+   Test14 = [localvar ident(x)
+	     [localvar ident(y)
+	      [
+		[threadt
+			[
+			    [conditional ident(x)
+				[bind ident(y) literal(t)]
+				[bind ident(y) literal(f)]
+			    ]
+			]
+		 endt
+		]
+		[threadt
+			[
+			    [conditional ident(y)
+				[bind ident(x) literal(t)]
+				[bind ident(x) literal(f)]
+			    ]
+			]
+		 endt
+		]
+	       [bind ident(y) literal(t)]
+	       ]
+	     ]
+	    ]
+   {Inspect {Interpret Test14}}
 
 end
