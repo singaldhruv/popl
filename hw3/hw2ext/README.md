@@ -1,11 +1,10 @@
 
-CS350A (Principles of Programming Languages) - Homework 2, Part 2
+CS350A (Principles of Programming Languages) - Homework 3
 =========================================================
 
 ## Team Members:
 * Pranav Maneriker, 12497
 * Dhruv Singal, 12243
-* Sanjana Garg, 13617
 
 ## Notes: 
 * There are *seven* files in the submission - Eval.oz, SingleAssignmentStore.oz, Stack.oz, Unify.oz, ProcessRecords.oz, Test.oz and examples.oz.
@@ -24,4 +23,5 @@ CS350A (Principles of Programming Languages) - Homework 2, Part 2
     - Procedure definitions must have variables as formal parameters.
 * Computation of closure is done by  function `ComputeClosure` according to the rules specific to each type of statement.
 * Full functionality of pattern matching is supported for records.
+* Multithreading support
 
