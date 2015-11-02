@@ -164,7 +164,7 @@ local Test11 in
   % {Inspect {Interpret Test11}}
 end
 
-local Test12 Test13 Test14 in
+local Test12 Test13 Test14 Test15 in
    Test12 = [localvar ident(x)
 	     [
 	      [bind ident(x) literal(1)]
@@ -192,6 +192,7 @@ local Test12 Test13 Test14 in
 	       ]
 	     ]
 	    ]
+   %Test14 3 threads
    Test14 = [localvar ident(x)
 	     [localvar ident(y)
 	      [
@@ -217,6 +218,31 @@ local Test12 Test13 Test14 in
 	       ]
 	     ]
 	    ]
-   {Inspect {Interpret Test14}}
+   %2 threads, suspend
+   Test15 = [localvar ident(x)
+	     [localvar ident(y)
+	      [
+		[threadt
+			[
+			    [conditional ident(x)
+				[bind ident(y) literal(t)]
+				[bind ident(y) literal(f)]
+			    ]
+			]
+		 endt
+		]
+		[threadt
+			[
+			    [conditional ident(y)
+				[bind ident(x) literal(t)]
+				[bind ident(x) literal(f)]
+			    ]
+			]
+		 endt
+		]
+	       ]
+	     ]
+	    ]
+   {Inspect {Interpret Test15}}
 
 end
