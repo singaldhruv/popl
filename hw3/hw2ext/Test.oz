@@ -5,7 +5,7 @@
 %Test for compound statements
 local Test1 in
      Test1 = [[[nop]] [nop]]
-     {Inspect {Interpret Test1}}
+%     {Inspect {Interpret Test1}}
 end
       
 
@@ -168,14 +168,14 @@ end
 local Test12 in
    Test12 = [localvar ident(x)
 	     [
-	      [bind ident(x) 1]
+	      [bind ident(x) literal(1)]
 	      [threadt
-	       [bind ident(x) 1]
-	       endt
+	       [
+		[bind ident(x) literal(1)]
+	       ]
 	      ]
 	     ]
 	    ]
    {Inspect {Interpret Test12}}
-end
 
-   
+end

@@ -6,9 +6,9 @@
 declare EvalMltTh CanStackUnsuspend CanMStackUnsuspend Eval Interpret RemoveParams ParamList BindParams ComputeClosure PutParams in
 
 
-% fun {Interpret Stmt}
-%    {Eval [semstmt(stmt:Stmt env:env())]}
-% end
+fun {Interpret Stmt}
+   {EvalMltTh [semstmt(stmt:Stmt env:env())]|nil [false]}
+end
 
 %Implementing closures -> copy the old bindings from variables used in function except those of bound vars
 fun {ComputeClosure Env Stmts EnvSoFar}
@@ -124,8 +124,7 @@ end
 
 fun {Eval Stack}
    %{Inspect {Dictionary.entries SAS}}
-   %{Inspect {TopStack Stack}}
-   local Stack TopSemStmt TopStmt TopEnv NStack in
+   local TopSemStmt TopStmt TopEnv NStack in
       TopSemStmt = {TopStack Stack}
       if TopSemStmt == nil then
 	    %If the semantic stack is exhausted, do something
@@ -136,7 +135,6 @@ fun {Eval Stack}
          TopEnv = TopSemStmt.env
 	    %Pop this off the stack
          NStack = {PopStack Stack}
-
          case TopStmt
 
 	    %Skip. Evaluate the rest of the stack.
@@ -336,71 +334,81 @@ fun {CanMStackUnsuspend MultStk}
    end
 end
 
-   
+
 
 fun {EvalMltTh MStack SuspendL}
    local Stack TopSemStmt TopStmt TopEnv NStack in
       {Browse MStack}
       {Browse SuspendL}
+      {Inspect {Dictionary.entries SAS}}
       if MStack == nil then allThreadsDone
       else
 	 Stack = {TopStack MStack}
 	 TopSemStmt = {TopStack Stack}
             %TopSemStmt contains the top semantic statement
-	 TopStmt = TopSemStmt.stmt
-	 TopEnv = TopSemStmt.env
-
-	 case TopStmt
-	 of threadt|S|endt then
-	    local NewStack in
-	       NewStack = semstmt(stmt:S env:TopEnv)
-	       {EvalMltTh {PushStack MStack NewStack} {PushStack SuspendL false}}
-	    end
-
-	 else
-	    local RemStack NextStack NewSuspendL NewMStack in
-	       if {TopStack SuspendL} == false orelse {CanStackUnsuspend Stack} then
-                      %Either this stack is not suspended or it can be unsuspended 
-		  try
-		     RemStack = {Eval Stack}
-		     case RemStack
-		     of accepted then
+	 if TopSemStmt == nil then
                             %This thread is over
-			{EvalMltTh {PopStack MStack} {PopStack SuspendL}}
-		     else
-			NewSuspendL = {PushStack {PopStack SuspendL} false} %put false in suspend list 
-			NewMStack = {PushStack {PopStack MStack} RemStack} %similar update for multistack
-			{EvalMltTh NewMStack NewSuspendL}
-		     end
-		  catch 
+	    {EvalMltTh {PopStack MStack} {PopStack SuspendL}}
+	 else
+	    TopStmt = TopSemStmt.stmt
+	    TopEnv = TopSemStmt.env
+	    {Inspect TopStmt}
+	    case TopStmt
+	    of threadt|S then
+	       {Browse threading}
+	       local NewStack CurStack NewMStack in
+		  NewStack = [semstmt(stmt:S env:TopEnv)]
+		  CurStack = {PopStack Stack}
+		  {Inspect CurStack}
+		  NewMStack = {PushStack {PushStack {PopStack MStack} CurStack} NewStack}
+		  
+		  {EvalMltTh NewMStack {PushStack SuspendL false}}
+	       end
+
+	    else
+	       local RemStack NextStack NewSuspendL NewMStack in
+		  if {TopStack SuspendL} == false orelse {CanStackUnsuspend Stack} then
+                      %Either this stack is not suspended or it can be unsuspended 
+		     try
+			RemStack = {Eval Stack}
+			case RemStack
+			of accepted then
+                            %This thread is over
+			   {EvalMltTh {PopStack MStack} {PopStack SuspendL}}
+			else
+			   NewSuspendL = {PushStack {PopStack SuspendL} false} %put false in suspend list 
+			   NewMStack = {PushStack {PopStack MStack} RemStack} %similar update for multistack
+			   {EvalMltTh NewMStack NewSuspendL}
+			end
+		     catch 
                            %Catch suspend errors and update accordingly
-		     conditionalOnUnbound(X) then
+			conditionalOnUnbound(X) then
 %%%TODO: Discuss whether to cycle
-		     NewSuspendL = {PushStack {PopStack SuspendL} true}
-		     {EvalMltTh MStack NewSuspendL} 
-		  [] matchOnUnbound(X) then
+			NewSuspendL = {PushStack {PopStack SuspendL} true}
+			{EvalMltTh MStack NewSuspendL} 
+		     [] matchOnUnbound(X) then
 %%%TODO: Discuss whether to cycle
-		     NewSuspendL = {PushStack {PopStack SuspendL} true}
-		     {EvalMltTh MStack NewSuspendL} 
-		  [] Err then raise Err end
-		  end
-	       else
+			NewSuspendL = {PushStack {PopStack SuspendL} true}
+			{EvalMltTh MStack NewSuspendL} 
+		     [] Err then raise Err end
+		     end
+		  else
                     %this thread is suspended and cannot unsuspend
-		  if {CanMStackUnsuspend MStack} then
+		     if {CanMStackUnsuspend MStack} then
                          %There is some thread which can be unsuspended
                          %Cycle the threads 
-		     NewSuspendL = {AppendStack {PopStack SuspendL} true}
-		     NewMStack = {AppendStack {PopStack MStack} Stack}
-		     {EvalMltTh NewMStack NewSuspendL}
-		  else raise allThreadsSuspended end  %all threads suspended
+			NewSuspendL = {AppendStack {PopStack SuspendL} true}
+			NewMStack = {AppendStack {PopStack MStack} Stack}
+			{EvalMltTh NewMStack NewSuspendL}
+		     else raise allThreadsSuspended end  %all threads suspended
+		     end
+		     
 		  end
-                     
 	       end
 	    end
 	 end
       end
    end
 end
-
                
                
